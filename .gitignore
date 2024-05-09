@@ -1,0 +1,13 @@
+.bsp
+.idea
+out
+target
+.DS_Store
+project/target
+/ui
+node_modules
+
+.bloop
+/project/project
+target
+.metals
