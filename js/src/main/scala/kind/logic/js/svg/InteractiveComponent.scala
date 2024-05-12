@@ -22,8 +22,8 @@ object InteractiveComponent {
       messageOpt match {
         case Some(msg) =>
           // TODO: the message flashes/jumps if the div goes off the screen and introduces scrollbars
-          tooltip.style.left = e.clientX + 10 + "px"
-          tooltip.style.top = e.clientY + 10 + "px"
+          tooltip.style.left = s"${e.clientX + 10}px"
+          tooltip.style.top = s"${e.clientY + 10}px"
           tooltip.style.display = "flex"
           tooltip.innerHTML = ""
 

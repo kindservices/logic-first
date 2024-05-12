@@ -9,6 +9,17 @@ ThisBuild / versionScheme := Some("early-semver")
 
 ThisBuild / resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
 
+// required for publishing
+ThisBuild / publishMavenStyle := true
+ThisBuild / homepage := Some(url("https://kindservices.co.uk"))
+ThisBuild / licenses := Seq("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0.html"))
+ThisBuild / developers := List(
+  Developer(id="aaronp", name="Aaron Pritzlaff", email="aaron@kindservices.co.uk", url=url("https://kindservices.co.uk"))
+)
+ThisBuild / publishTo := Some("GitHub Package Registry" at s"https://maven.pkg.github.com/$githubUser/$githubRepo")
+// ThisBuild / publishTo := Some("GitHub Package Registry" at s"https://maven.pkg.github.com/$githubUser/$githubRepo")
+
+
 // Common settings
 lazy val commonSettings = Seq(
   buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion),
@@ -64,11 +75,9 @@ lazy val root = project.in(file(".")).
   )
 
 
-ThisBuild / publishMavenStyle := true
 
 val githubUser = "kindservices"
 val githubRepo = "logic-first"
-ThisBuild / publishTo := Some("GitHub Package Registry" at s"https://maven.pkg.github.com/$githubUser/$githubRepo")
 
 sys.env.get("GITHUB_TOKEN") match {
   case Some(token) if token.nonEmpty =>
@@ -98,7 +107,6 @@ publishTo := {
     Some("releases" at nexus + "service/local/staging/deploy/maven2")
 }
 
-publishMavenStyle := true
 
 // see https://leonard.io/blog/2017/01/an-in-depth-guide-to-deploying-to-maven-central/
 pomIncludeRepository := (_ => false)

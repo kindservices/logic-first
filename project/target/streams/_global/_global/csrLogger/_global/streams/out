@@ -1,6 +1,0 @@
-[debug] downloaded https://repo1.maven.org/maven2/org/pantsbuild/jarjar/1.6.5/jarjar-1.6.5-sources.jar
-[debug] downloaded https://repo1.maven.org/maven2/org/apache/commons/commons-lang3/3.4/commons-lang3-3.4-sources.jar
-[debug] downloaded https://repo1.maven.org/maven2/org/ow2/asm/asm/6.0/asm-6.0-sources.jar
-[debug] downloaded https://repo1.maven.org/maven2/org/ow2/asm/asm-commons/6.0/asm-commons-6.0-sources.jar
-[debug] downloaded https://repo1.maven.org/maven2/org/ow2/asm/asm-tree/6.0/asm-tree-6.0-sources.jar
-[debug] downloaded https://repo.scala-sbt.org/scalasbt/sbt-plugin-releases/com.eed3si9n/sbt-assembly/scala_2.12/sbt_1.0/0.14.6/srcs/sbt-assembly-sources.jar
