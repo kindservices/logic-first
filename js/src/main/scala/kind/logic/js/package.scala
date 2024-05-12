@@ -26,7 +26,8 @@ package object js {
       container.title = name
       container
         .getElement()
-        .html(div(h2(cls := "subtitle", s"${name}!"), div(JSON.stringify(state))).render)
+        // .html(div(h2(cls := "subtitle", s"${name}!"), div(JSON.stringify(state))).render)
+        .html(div(h2(cls := "subtitle", s"${name}!"), div(state.toString)).render)
     }
 
     def replace(node: Node) = container.getElement().html(node)
