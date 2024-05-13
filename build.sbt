@@ -54,12 +54,13 @@ lazy val app = crossProject(JSPlatform, JVMPlatform).in(file(".")).
   enablePlugins(BuildInfoPlugin).
   settings(commonSettings).
   jvmSettings(
+    name := "logic-first-jvm", // NOTE: this will change he published artefacts, which is ugly in downstream projects
     libraryDependencies ++= Seq(
       "com.lihaoyi" %% "cask" % "0.9.2",
       "com.github.aaronp" %% "eie" % "2.0.1")
-//      "com.github.aaronp" %% "eie" % "2.0.1" % Test)
   ).
   jsSettings(
+    name := "logic-first-js",
     scalaJSUseMainModuleInitializer := true,
     libraryDependencies ++= Seq(
       "io.github.cquiroz" %%% "scala-java-time" % "2.5.0",
