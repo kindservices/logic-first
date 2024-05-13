@@ -29,7 +29,9 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-sbt-
 
+    - name: Test
+      run: sbt clean test
     - name: Publish to GitHub Packages
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: sbt test publish
+      run: sbt clean publish
