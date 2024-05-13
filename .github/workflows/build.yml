@@ -30,8 +30,8 @@ jobs:
           ${{ runner.os }}-sbt-
 
     - name: Test
-      run: sbt clean test
+      run: sbt "project appJVM" clean test
     - name: Publish to GitHub Packages
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: sbt clean publish
+      run: sbt publish
