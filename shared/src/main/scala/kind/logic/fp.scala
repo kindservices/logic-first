@@ -94,7 +94,7 @@ extension [F[_]: Monad, A](fa: F[A])
   * @tparam G
   *   the result type constructor
   */
-trait ~>[F[_], G[_]]:
+trait NatTransform[F[_], G[_]]:
   def apply[A](fa: F[A]): G[A]
 
 enum Program[F[_], A]:
@@ -107,7 +107,7 @@ enum Program[F[_], A]:
 
   final def map[B](f: A => B): Program[F, B] = FlatMap[F, A, B](this, a => Program.of(f(a)))
 
-  final def foldMap[G[_]: Monad](using nt: F ~> G): G[A] = this match {
+  final def foldMap[G[_]: Monad](using nt: NatTransform[F, G]): G[A] = this match {
     case Pure(value) => Monad[G].pure(value)
     case Suspend(fa) => nt(fa)
     case FlatMap(inner, f) =>

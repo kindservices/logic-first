@@ -24,7 +24,7 @@ abstract class RunnableProgram[F[_]](val logic: [A] => F[A] => Result[A])(using
     */
   def run[A](fa: Program[F, A], trace: Boolean = true): Task[A] = {
     @targetName("programAsTask")
-    given ~>[F, Task] with {
+    given NatTransform[F, Task] with {
       override def apply[A](fa: F[A]): Task[A] =
         if trace then traceOnInput(fa) else onInput(fa).task
     }

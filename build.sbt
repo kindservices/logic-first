@@ -1,8 +1,10 @@
 import org.scalajs.linker.interface.ModuleSplitStyle
 
+val githubUser = "kindservices"
+val githubRepo = "logic-first"
+
 ThisBuild / name := "logic-first"
 ThisBuild / organization := "com.github.aaronp"
-// version := "0.0.1"
 ThisBuild / scalaVersion := "3.4.1"
 ThisBuild / scalafmtOnCompile := true
 ThisBuild / versionScheme := Some("early-semver")
@@ -17,8 +19,14 @@ ThisBuild / developers := List(
   Developer(id="aaronp", name="Aaron Pritzlaff", email="aaron@kindservices.co.uk", url=url("https://kindservices.co.uk"))
 )
 ThisBuild / publishTo := Some("GitHub Package Registry" at s"https://maven.pkg.github.com/$githubUser/$githubRepo")
-// ThisBuild / publishTo := Some("GitHub Package Registry" at s"https://maven.pkg.github.com/$githubUser/$githubRepo")
 
+ThisBuild / version := {
+  val baseVersion = "0.1." + sys.env.getOrElse("GITHUB_RUN_NUMBER", "0")
+  if (sys.env.getOrElse("GITHUB_REF", "").contains("refs/heads/main"))
+    baseVersion
+  else
+    s"$baseVersion-SNAPSHOT"
+}
 
 // Common settings
 lazy val commonSettings = Seq(
@@ -75,10 +83,6 @@ lazy val root = project.in(file(".")).
   )
 
 
-
-val githubUser = "kindservices"
-val githubRepo = "logic-first"
-
 sys.env.get("GITHUB_TOKEN") match {
   case Some(token) if token.nonEmpty =>
     ThisBuild / credentials += Credentials(
@@ -93,19 +97,7 @@ sys.env.get("GITHUB_TOKEN") match {
 }
 
 
-releasePublishArtifactsAction := PgpKeys.publishSigned.value
-
 assembly / test := {}
-
-credentials += Credentials(Path.userHome / ".sbt" / ".credentials")
-
-publishTo := {
-  val nexus = "https://oss.sonatype.org/"
-  if (isSnapshot.value)
-    Some("snapshots" at nexus + "content/repositories/snapshots")
-  else
-    Some("releases" at nexus + "service/local/staging/deploy/maven2")
-}
 
 
 // see https://leonard.io/blog/2017/01/an-in-depth-guide-to-deploying-to-maven-central/
