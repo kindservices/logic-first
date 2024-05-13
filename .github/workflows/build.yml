@@ -35,3 +35,16 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: sbt publish
+    - name: Get SBT version
+      id: sbt_version
+      run: echo "SBT_VERSION=$(sbt --no-colors 'show version' | tail -n 1 | awk '{print $2}')" >> $GITHUB_ENV
+
+    - name: Set up Git user
+      run: |
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+    - name: Create Git tag
+      run: git tag v${{ env.SBT_VERSION }}
+    
+    - name: Push tag
+      run: git push origin v${{ env.SBT_VERSION }}
