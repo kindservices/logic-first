@@ -5,7 +5,6 @@ val githubRepo = "logic-first"
 
 ThisBuild / name := "logic-first"
 ThisBuild / organization := "com.github.aaronp"
-// version := "0.0.1"
 ThisBuild / scalaVersion := "3.4.1"
 ThisBuild / scalafmtOnCompile := true
 ThisBuild / versionScheme := Some("early-semver")
@@ -21,6 +20,13 @@ ThisBuild / developers := List(
 )
 ThisBuild / publishTo := Some("GitHub Package Registry" at s"https://maven.pkg.github.com/$githubUser/$githubRepo")
 
+version := {
+  val baseVersion = "0.1." + sys.env.getOrElse("GITHUB_RUN_NUMBER", "0")
+  if (sys.env.getOrElse("GITHUB_REF", "").contains("refs/heads/main"))
+    baseVersion
+  else
+    s"$baseVersion-SNAPSHOT"
+}
 
 // Common settings
 lazy val commonSettings = Seq(
