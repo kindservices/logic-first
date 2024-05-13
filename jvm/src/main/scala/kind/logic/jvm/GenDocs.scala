@@ -11,6 +11,7 @@ case class Scenario[A](title: String, input: A, genMermaid: A => String, subDir:
       case s"/$p/" => s"$p/$fileName.md"
       case s"$p/"  => s"$p/$fileName.md"
       case s"/$p"  => s"$p/$fileName.md"
+      case ""      => s"$fileName.md"
       case p       => s"$p/$fileName.md"
     }
   }
@@ -59,4 +60,3 @@ object GenDocs {
       .mkString(header, "\n", "")
   }
 }
-//@main def genDocs() = {}
