@@ -30,13 +30,13 @@ trait Telemetry(val callsStackRef: Ref[CallStack]) {
     *   the calls as a mermaid sequence diagram
     */
   def asMermaidSequenceDiagram: UIO[String] = calls.map { all =>
-    val statements = Telemetry.asMermaidStatements(all.sortBy(_.timestamp))
+    val statements = Telemetry.asMermaidStatements(all.sortBy(_.timestamp.asNanos))
 
     // we want to group the participants together by category
     // this
     val participants = {
       val (orderedCategories, actorsByCategory) = all
-        .sortBy(_.timestamp)
+        .sortBy(_.timestamp.asNanos)
         .foldLeft((Seq[String](), Map[String, Seq[Actor]]())) {
           case ((categories, coordsByCategory), call) =>
             val newMap = coordsByCategory

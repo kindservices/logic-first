@@ -2,8 +2,23 @@ package kind
 import zio.*
 import kind.logic.telemetry.*
 import scala.util.NotGiven
+import scala.concurrent.duration.FiniteDuration
 
 package object logic {
+
+  opaque type Timestamp = Long
+
+  extension (tsNanos: Long) {
+    def asTimestampNanos: Timestamp                = tsNanos
+    def +(duration: Duration): Timestamp           = tsNanos + duration.toNanos
+    def addDuration(duration: Duration): Timestamp = tsNanos + duration.toNanos
+    def *(scale: Double): Timestamp                = (tsNanos * scale).toLong
+  }
+
+  extension (ts: Timestamp) {
+    def asNanos: Long  = ts
+    def asMillis: Long = ts / 1000000
+  }
 
   /** A common convenience method for ZIO stuff... might as well stick it here
     */

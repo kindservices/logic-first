@@ -1,7 +1,7 @@
 package kind.logic.js.svg.ui
 
 import kind.logic.js.svg.*
-import kind.logic.Actor
+import kind.logic.*
 import kind.logic.telemetry.*
 import kind.logic.color.Colors
 
@@ -107,8 +107,8 @@ class MessageLayout(
     positionByActor: Map[Actor, Point],
     callback: MessageLayout.Callback
 ):
-  val minTime = allMessages.map(_.timestamp).min
-  val maxTime = allMessages.map(_.endTimestamp).max
+  val minTime: Timestamp = allMessages.map(_.timestamp.asNanos).min.asTimestampNanos
+  val maxTime: Timestamp = allMessages.map(_.endTimestamp.asNanos).max.asTimestampNanos
 
   import MessageLayout.*
 
@@ -128,7 +128,7 @@ class MessageLayout(
     Point(x.toInt, y.toInt)
   }
 
-  def layout(atTime: Long) = {
+  def layout(atTime: Timestamp) = {
     allMessagesWithId.foreach { msg =>
 
       val fromPoint = positionByActor(msg.from)
@@ -140,7 +140,7 @@ class MessageLayout(
         // base location. It works because the 'moveTo' logic will make messages transparent if they're at their start (or end) locations
         msg.moveTo(fromPoint, 0.0)
       } else {
-        val percentage = (atTime.toDouble - msg.timestamp) / msg.duration.toMillis
+        val percentage = (atTime.asNanos.toDouble - msg.timestamp.asNanos) / msg.duration.toMillis
         val point      = tween(fromPoint, toPoint, percentage)
         msg.moveTo(point, percentage)
       }

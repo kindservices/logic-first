@@ -6,13 +6,10 @@ import zio.*
 /** Represents a Call invocation -- something we'd want to capture in our archtiecture (i.e. a
   * sequence diagram describing our system)
   *
-  * @param source
-  * @param target
-  * @param operation
   * @param input
   *   the input which triggered this call
-  * @param timestamp
-  *   the time the call was made
+  * @param response
+  *   a holder for when the response completes
   */
 private[telemetry] final class Call(
     invocation: CallSite,
@@ -43,11 +40,11 @@ private[telemetry] final class Call(
       result <- either match {
         case Left(err) =>
           for
-            _      <- response.set(CallResponse.Error(time, err))
+            _      <- response.set(CallResponse.Error(time.asTimestampNanos, err))
             failed <- ZIO.fail(err)
           yield failed
         case Right(ok) =>
-          response.set(CallResponse.Completed(time, ok)).as(ok)
+          response.set(CallResponse.Completed(time.asTimestampNanos, ok)).as(ok)
       }
     yield result
   }
@@ -58,6 +55,6 @@ object Call {
     for
       time        <- now
       responseRef <- Ref.make[CallResponse](CallResponse.NotCompleted)
-    yield new Call(CallSite(source, target, operation, time), responseRef)
+    yield new Call(CallSite(source, target, operation, time.asTimestampNanos), responseRef)
   }
 }

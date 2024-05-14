@@ -1,6 +1,7 @@
 package kind.logic.js.svg.ui
 
 import kind.logic.js.svg.*
+import kind.logic.*
 import org.scalajs.dom
 import scalatags.JsDom.all.*
 import scalatags.JsDom.implicits.given
@@ -48,23 +49,24 @@ class InteractiveMessageSvgComponent(
 
   private val timeSlider = {
     val stepSize =
-      (messagesLayout.maxTime - messagesLayout.minTime) / 100 // split the total time into 100 steps
+      (messagesLayout.maxTime.asNanos - messagesLayout.minTime.asNanos) / 100 // split the total time into 100 steps
     input(
       id     := "time-slider",
       `type` := "range",
-      min    := messagesLayout.minTime,
-      max    := messagesLayout.maxTime,
-      value  := messagesLayout.minTime,
+      min    := messagesLayout.minTime.asNanos,
+      max    := messagesLayout.maxTime.asNanos,
+      value  := messagesLayout.minTime.asNanos,
       step   := stepSize,
       style  := s"width: ${config.width * 0.6}px; margin-left: ${config.width * 0.2}px"
     ).render
   }
   private val timeSliderLabel = label(`for` := "time-slider")("Time:").render
 
+  def timestampSliderValue = BigDecimal(timeSlider.value).toLong.asTimestampNanos
+
   private def refresh() = {
     playPauseButton.value = playPauseLabel
-    val time     = timeSlider.value.toInt
-    val messages = messagesLayout.layout(time)
+    val messages = messagesLayout.layout(timestampSliderValue)
   }
 
   private def playPauseLabel = if playing then "Pause ⏸️" else "Play ▶️"
@@ -110,7 +112,7 @@ class InteractiveMessageSvgComponent(
   private def onTick() = {
 
     if playing then {
-      val currentTime = timeSlider.value.toIntOption.getOrElse(0)
+      val currentTime = timestampSliderValue.asNanos
       val newTime     = currentTime + playIncrement
       if newTime >= timeSlider.max.toInt then {
         playing = false

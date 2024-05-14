@@ -9,19 +9,18 @@ import scala.concurrent.duration.{given, *}
 case class SendMessage(
     from: Actor,
     to: Actor,
-    timestamp: Long,
+    timestamp: kind.logic.Timestamp,
     duration: Duration,
     arrow: String, // the mermaid arrow. This is a bit hacky
     message: Any,
     comment: String = ""
 ) {
-  def endTimestamp = timestamp + duration.toMillis
+  // def endTimestamp: kind.logic.Timestamp = timestamp.addDuration(duration)
+  def endTimestamp: kind.logic.Timestamp = (timestamp.asNanos + duration.toNanos).asTimestampNanos
 
-  def timestampInNanos    = timestamp * 1000000
-  def endTimestampInNanos = timestampInNanos + duration.toNanos
-  def durationInNanos     = duration.toNanos
-
-  def isActiveAt(time: Long) = timestamp <= time && time <= timestamp + duration.toMillis
+  def isActiveAt(time: Timestamp) = {
+    (timestamp.asNanos <= time.asNanos) && (time.asNanos <= endTimestamp.asNanos)
+  }
 
   def messageFormatted = message match {
     case json: ujson.Value => json.render(2)
@@ -51,18 +50,18 @@ object SendMessage {
   def scaleToFit(messages: Seq[SendMessage], fitTo: FiniteDuration): Seq[SendMessage] = {
     if messages.isEmpty then return messages
 
-    val fromTimeNanos = messages.map(_.timestampInNanos).min
+    val fromTimeNanos = messages.map(_.timestamp.asNanos).min
     val scaleFactor = {
-      val toTimeNanos = messages.map(_.endTimestampInNanos).max
+      val toTimeNanos = messages.map(_.endTimestamp.asNanos).max
 
       fitTo.toNanos.toDouble / (toTimeNanos - fromTimeNanos)
     }
 
     messages.map { msg =>
-      val scaledDelta = ((msg.timestampInNanos - fromTimeNanos) * scaleFactor).toLong
+      val scaledDelta = ((msg.timestamp.asNanos - fromTimeNanos) * scaleFactor).toLong
       msg.copy(
-        timestamp = fromTimeNanos + scaledDelta,
-        duration = (msg.durationInNanos * scaleFactor).toLong.nanos
+        timestamp = (fromTimeNanos + scaledDelta).asTimestampNanos,
+        duration = (msg.duration * scaleFactor)
       )
     }
   }
@@ -141,7 +140,7 @@ object SendMessage {
 
     // NOTE - this is technically inefficient, but we're talking about lists of 2 or 3 items
     def appendInProgress(call: CompletedCall) =
-      (call +: sortedCompleted).sortBy(_.endTimestamp.getOrElse(-1L))
+      (call +: sortedCompleted).sortBy(_.endTimestamp.fold(-1L)(_.asNanos))
 
     (sortedCalls, sortedCompleted) match {
       case (Seq(), Seq()) => buffer
@@ -155,14 +154,15 @@ object SendMessage {
         buffer :+ startCall(nextCall, "->>")
       // the case when our next completion ends before or at the same time as the next call:
       case (nextCall +: theRestCalls, inProgress +: theRestInProgress)
-          if inProgress.endTimestamp.exists(_ <= nextCall.timestamp) =>
+          if inProgress.endTimestamp.exists(_.asNanos <= nextCall.timestamp.asNanos) =>
         fromCalls(
           nextCall +: theRestCalls,
           theRestInProgress,
           buffer :++ endCall(inProgress, "-->>-")
         )
       // the case when our next call doesn't complete until after the subsequent call:
-      case (callA +: callB +: theRestCalls, _) if callA.endTimestamp.exists(_ > callB.timestamp) =>
+      case (callA +: callB +: theRestCalls, _)
+          if callA.endTimestamp.exists(_.asNanos > callB.timestamp.asNanos) =>
         fromCalls(
           callB +: theRestCalls,
           appendInProgress(callA),

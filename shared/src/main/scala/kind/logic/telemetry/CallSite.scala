@@ -6,5 +6,5 @@ private[telemetry] case class CallSite(
     source: Actor,
     target: Actor,
     operation: Any,
-    timestamp: Long
+    timestamp: Timestamp
 )
