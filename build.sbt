@@ -21,7 +21,7 @@ ThisBuild / developers := List(
 ThisBuild / publishTo := Some("GitHub Package Registry" at s"https://maven.pkg.github.com/$githubUser/$githubRepo")
 
 ThisBuild / version := {
-  val baseVersion = "0.1." + sys.env.getOrElse("GITHUB_RUN_NUMBER", "0")
+  val baseVersion = "0.2." + sys.env.getOrElse("GITHUB_RUN_NUMBER", "0")
   if (sys.env.getOrElse("GITHUB_REF", "").contains("refs/heads/main"))
     baseVersion
   else
