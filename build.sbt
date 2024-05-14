@@ -21,7 +21,14 @@ ThisBuild / developers := List(
 ThisBuild / publishTo := Some("GitHub Package Registry" at s"https://maven.pkg.github.com/$githubUser/$githubRepo")
 
 ThisBuild / version := {
-  val baseVersion = "0.2." + sys.env.getOrElse("GITHUB_RUN_NUMBER", "0")
+  val buildNr = {
+    val runNumber = sys.env.getOrElse("GITHUB_RUN_NUMBER", "0").toInt
+    // this is my little hack. The run numbers always increase, an we want to reset them when
+    // bump to the next version. To do that, we just subtract whatever the last build number was
+    // before we incremented the minor version
+    runNumber - 16
+  }
+  val baseVersion = s"0.3.$buildNr"
   if (sys.env.getOrElse("GITHUB_REF", "").contains("refs/heads/main"))
     baseVersion
   else
