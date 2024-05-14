@@ -5,7 +5,6 @@ import kind.logic.jvm.*
 import kind.logic.*
 import kind.examples.trade.restaurant.{Order as ROrder, *}
 import kind.examples.trade.market.*
-import eie.io.{*, given}
 import kind.examples.trade
 
 import scala.language.implicitConversions
@@ -69,7 +68,7 @@ def endToEndFlow = {
 
     }
 
-    val result = endToEnd.placeOrder(order).execOrThrow()
+    endToEnd.placeOrder(order).execOrThrow()
     telemetry.calls.execOrThrow().foreach(println)
     telemetry.asMermaidDiagram().execOrThrow()
   }
@@ -79,7 +78,7 @@ def endToEndFlow = {
 
 @main def genDocs() = {
 
-  val scenarios = List(
+  List(
     restaurantFlow,
     marketFlow,
     endToEndFlow

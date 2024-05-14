@@ -1,25 +1,70 @@
 package kind.logic
 
-import org.scalajs.dom.html.Div
-import org.scalajs.dom.{MouseEvent, window}
-import org.scalajs.dom.html.{Div, Input}
+import kind.logic.js.goldenlayout.UIComponent
 import scalatags.JsDom.all.*
 import org.scalajs.dom.Node
 import scala.scalajs.js.JSON
+import scala.scalajs.js.Dynamic.global
 
-import java.time.format.DateTimeFormatter
-import concurrent.duration.*
-import java.time.{ZoneId, ZonedDateTime}
-
-import upickle.default.{ReadWriter => RW, macroRW}
-import upickle.default.*
 import ujson.Value
 
 package object js {
   type Json = ujson.Value
 
-  /** This layout is exported in main.js for us to reference here */
-  def myLayout = scala.scalajs.js.Dynamic.global.window.myLayout
+  import scala.scalajs.js.annotation.JSExportTopLevel
+
+  /** This is our single function for rendered any new component, rather than the typical
+    * GoldenLayout way of doing it.
+    *
+    * This was due to the amount of duplication/effort in having to export new functions, registerer
+    * them, etc.
+    *
+    * See the docs on UIComponent and the GoldenLayout 'addMenuItem' extension function for more
+    * info.
+    *
+    * @param container
+    *   the container of this component
+    * @param state
+    *   the component state
+    */
+  @JSExportTopLevel("createNewComponent")
+  def createNewComponent(container: scala.scalajs.js.Dynamic, state: scala.scalajs.js.Dynamic) = {
+    val stateJS = ujson.read(JSON.stringify(state))
+    kind.logic.js.goldenlayout.UIComponent.get(s"${state.id}") match {
+      case Some(comp) =>
+        container.setTitle(s"${state.title}")
+        container.replace(comp.render(stateJS))
+      case None =>
+        // the component doesn't have an ID -- default to the first component
+        kind.logic.js.goldenlayout.UIComponent.default() match {
+          case Some(comp) =>
+            container.setTitle(comp.title)
+            container.replace(comp.render(stateJS))
+
+            // hide the menu item as we're about to show it (and this is outside of our EventBus.activeTabs)
+            // this should then have the menu item hidden
+            comp.notifyOpened()
+          case None =>
+            container.setTitle("Dev Usage Error: No components registered")
+            container.replace(
+              div(
+                "Dev Usage Issue: No components registered. Use myLayout.addMenuItem(...) in your initLayout function"
+              ).render
+            )
+        }
+    }
+  }
+
+// this is used to update the menu.
+// we use 'getOrFirst' as the default component won't have an ID
+  @JSExportTopLevel("onComponentCreated")
+  def onComponentCreated(id: String) = UIComponent.getOrFirst(id).foreach(EventBus.tabOpen.publish)
+
+
+  // we use 'getOrFirst' as the default component won't have an ID
+  @JSExportTopLevel("onComponentDestroyed")
+  def onComponentDestroyed(id: String) =
+    UIComponent.getOrFirst(id).foreach(EventBus.tabClosed.publish)
 
   extension (container: scala.scalajs.js.Dynamic) {
     def placeholder(name: String, state: scala.scalajs.js.Dynamic) = {
@@ -38,45 +83,11 @@ package object js {
     def asJSON         = JSON.parse(jason)
   }
 
-  /** Represents a named scenario
-    *
-    * @param name
-    *   the friendly name of this scenario
-    * @param description
-    *   the description
-    * @param input
-    *   the input into this scenario
-    * @param lastResult
-    *   the result from the most-recent run of this scenario
-    */
-  case class TestScenario(
-      name: String,
-      description: String,
-      input: Json = ujson.Null,
-      lastResult: Option[TestResult] = None
-  ) derives ReadWriter {
-    def asJson: Value  = writeJs(this)
-    def inputAs[A: RW] = read[A](input)
-  }
-
-  object TestScenario {
-    def fromJson(jason: Json): TestScenario                 = read[TestScenario](jason)
-    def mapFromJson(jason: Json): Map[String, TestScenario] = read[Map[String, TestScenario]](jason)
-
-  }
-
   // for each stack in a test call frame, there is an input and an output
   type StackElement = (Json, Json)
 
-  /** The output of running a test scenario
-    */
-  case class TestResult(callstack: Seq[StackElement] = Nil, result: Json = ujson.Null)
-      derives ReadWriter {
-    def asJson: String = write(this)
-  }
-
-  object TestResult {
-    def fromJson(jason: Json): TestResult = read[TestResult](jason)
-  }
-
+  // these are used in index.html as we set up globallayout (e.g. myLayout)
+  global.window.createNewComponent = createNewComponent
+  global.window.onComponentDestroyed = onComponentDestroyed
+  global.window.onComponentCreated = onComponentCreated
 }

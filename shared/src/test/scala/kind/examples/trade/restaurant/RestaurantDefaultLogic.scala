@@ -1,6 +1,6 @@
 package kind.examples.trade.restaurant
 
-import kind.logic.{given, *}
+import kind.logic.*
 import kind.examples.trade.*
 
 object RestaurantDefaultLogic extends RestaurantDefaultLogic

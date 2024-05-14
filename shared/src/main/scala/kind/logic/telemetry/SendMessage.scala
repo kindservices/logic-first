@@ -1,8 +1,9 @@
 package kind.logic.telemetry
 
-import kind.logic.*
+import kind.logic._
+
 import scala.concurrent.duration.Duration
-import scala.concurrent.duration.{given, *}
+import scala.concurrent.duration._
 
 /** Representation of a message being sent from one actor to another
   */

@@ -1,24 +1,16 @@
 package kind.logic.js.svg.ui
 
-import scala.scalajs.js
-import scala.scalajs.js.annotation.*
-import org.scalajs.dom
-import scalatags.JsDom
-import kind.logic.js.svg.*
 import kind.logic.Actor
 import kind.logic.color.Colors
-import scalatags.JsDom.svgTags as stags
-import scalatags.JsDom.svgTags.*
-import scalatags.JsDom.svgAttrs.*
-import scalatags.JsDom.implicits.{*, given}
-import org.scalajs.dom.Node
-
-import scala.scalajs.js.annotation.*
-import scala.concurrent.duration.{*, given}
-import scalatags.JsDom.TypedTag
-
-import scala.collection.mutable.ListBuffer
+import kind.logic.js.svg._
+import org.scalajs.dom
 import org.scalajs.dom.Element
+import org.scalajs.dom.Node
+import scalatags.JsDom
+import scalatags.JsDom.implicits._
+import scalatags.JsDom.svgAttrs._
+import scalatags.JsDom.svgTags._
+import scalatags.JsDom.{svgTags => stags}
 
 /** This is probably the hardest part of this whole thing ... the trigonometry to lay out the actors
   * in a circle!
@@ -51,8 +43,8 @@ case class CategorySection(
 
   def actorComponents: Seq[Element] = {
 
-    val steps         = actorsInThisCategory.size
-    val step: Degrees = (arcEnd - arcStart) / (actorsInThisCategory.size + 1)
+    actorsInThisCategory.size
+    (arcEnd - arcStart) / (actorsInThisCategory.size + 1)
 
     actorsInThisCategory.map { case (actor, center) =>
       val yOffset = center.y + config.actorConfig.labelYOffset

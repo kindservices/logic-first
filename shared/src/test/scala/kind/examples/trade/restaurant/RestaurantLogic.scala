@@ -1,7 +1,6 @@
 package kind.examples.trade.restaurant
 
 import kind.logic.*
-import kind.logic.telemetry.*
 
 enum RestaurantLogic[A]:
   case GetStrategy                                  extends RestaurantLogic[Strategy]

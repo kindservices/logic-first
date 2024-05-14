@@ -1,16 +1,14 @@
 package kind.logic.js.svg.ui
 
-import kind.logic.js.svg.*
-import kind.logic.*
+import kind.logic._
+import kind.logic.js.svg._
 import org.scalajs.dom
-import scalatags.JsDom.all.*
-import scalatags.JsDom.implicits.given
-
-import scala.concurrent.duration.{*, given}
-import org.scalajs.dom.HTMLDivElement
-import scalatags.JsDom.svgAttrs.{height, style, width, xmlns}
+import scalatags.JsDom.all._
+import scalatags.JsDom.svgAttrs.height
+import scalatags.JsDom.svgAttrs.style
+import scalatags.JsDom.svgAttrs.width
+import scalatags.JsDom.svgAttrs.xmlns
 import scalatags.JsDom.svgTags.svg
-import scalatags.Text.TypedTag
 
 /** The container for the big circle thing showing the system actors and their messages
   *
@@ -66,7 +64,7 @@ class InteractiveMessageSvgComponent(
 
   private def refresh() = {
     playPauseButton.value = playPauseLabel
-    val messages = messagesLayout.layout(timestampSliderValue)
+    messagesLayout.layout(timestampSliderValue)
   }
 
   private def playPauseLabel = if playing then "Pause ⏸️" else "Play ▶️"
@@ -114,7 +112,15 @@ class InteractiveMessageSvgComponent(
     if playing then {
       val currentTime = timestampSliderValue.asNanos
       val newTime     = currentTime + playIncrement
-      if newTime >= timeSlider.max.toInt then {
+      val maxTime = timeSlider.max.toLongOption.getOrElse {
+
+        println(
+          s"Failed to parse maxTime: ${timeSlider.max}. newTime     = currentTime ($currentTime) + playIncrement $playIncrement"
+        )
+        0L
+      }
+
+      if newTime >= maxTime then {
         playing = false
       }
       timeSlider.value = s"${newTime}"

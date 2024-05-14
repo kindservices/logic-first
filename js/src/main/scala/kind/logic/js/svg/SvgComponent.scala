@@ -1,14 +1,10 @@
 package kind.logic.js.svg
 
-import kind.logic.telemetry.*
-import kind.logic.js.svg.*
-import kind.logic.js.svg.ui.*
 import kind.logic.Actor
+import kind.logic.js.svg.ui._
+import kind.logic.telemetry._
 import org.scalajs.dom
-import scalatags.JsDom.all.*
-import scalatags.JsDom.implicits.given
-
-import scala.concurrent.duration.{*, given}
+import scalatags.JsDom.all._
 
 object SvgComponent {
   def apply(actors: Seq[Actor], messages: Seq[SendMessage], config: Config = Config.default()) = {

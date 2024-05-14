@@ -1,8 +1,9 @@
 package kind.logic.telemetry
 
-import kind.logic.*
-import concurrent.duration.*
-import kind.logic.color.ConsoleColors.*
+import kind.logic._
+import kind.logic.color.ConsoleColors._
+
+import concurrent.duration._
 final case class CompletedCall(invocation: CallSite, response: CallResponse) {
 
   export invocation.*

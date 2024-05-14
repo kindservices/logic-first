@@ -1,4 +1,5 @@
 import org.scalajs.linker.interface.ModuleSplitStyle
+// import scalafix.sbt.ScalafixPlugin.autoImport.*
 
 val githubUser = "kindservices"
 val githubRepo = "logic-first"
@@ -20,6 +21,12 @@ ThisBuild / developers := List(
 )
 ThisBuild / publishTo := Some("GitHub Package Registry" at s"https://maven.pkg.github.com/$githubUser/$githubRepo")
 
+ThisBuild / semanticdbEnabled := true
+ThisBuild / semanticdbVersion := scalafixSemanticdb.revision
+
+addCommandAlias("removeUnusedImports", ";scalafix RemoveUnused")
+addCommandAlias("organiseImports", ";scalafix OrganizeImports")
+
 ThisBuild / version := {
   val buildNr = {
     val runNumber = sys.env.getOrElse("GITHUB_RUN_NUMBER", "0").toInt
@@ -34,6 +41,8 @@ ThisBuild / version := {
   else
     s"$baseVersion-SNAPSHOT"
 }
+
+// ThisBuild / compile in Compile := (compile in Compile).dependsOn(scalafixAll).value
 
 // Common settings
 lazy val commonSettings = Seq(
@@ -54,7 +63,8 @@ ThisBuild / scalacOptions ++= Seq(
   "-feature",
   "-unchecked",
   "-rewrite",
-  "-new-syntax"
+  "-new-syntax",
+  "-Wunused:all"
 )
 
 lazy val app = crossProject(JSPlatform, JVMPlatform).in(file(".")).
@@ -68,7 +78,7 @@ lazy val app = crossProject(JSPlatform, JVMPlatform).in(file(".")).
   ).
   jsSettings(
     name := "logic-first-js",
-    scalaJSUseMainModuleInitializer := true,
+    // scalaJSUseMainModuleInitializer := true,
     libraryDependencies ++= Seq(
       "io.github.cquiroz" %%% "scala-java-time" % "2.5.0",
       "com.lihaoyi" %%% "scalatags" % "0.12.0",

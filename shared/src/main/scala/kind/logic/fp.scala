@@ -1,7 +1,8 @@
 package kind.logic
 
+import zio._
+
 import scala.util.Try
-import zio.*
 
 /** Instead of bringing in an FP library, we just provides a minimal implementation of what we need
   * here

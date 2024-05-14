@@ -1,11 +1,13 @@
 package kind.logic.js
 
-import java.util.UUID
 import org.scalajs.dom
+import org.scalajs.dom._
+import org.scalajs.dom.document
+import org.scalajs.dom.html
 import org.scalajs.dom.html.Div
-import org.scalajs.dom.*
-import org.scalajs.dom.{document, html, window}
+import org.scalajs.dom.window
 
+import java.util.UUID
 import scala.collection.immutable
 import scala.reflect.ClassTag
 import scala.util.control.NonFatal
@@ -13,6 +15,11 @@ import scala.util.control.NonFatal
 object HtmlUtils extends HtmlUtils
 
 trait HtmlUtils {
+
+  def replace(container: HTMLElement, child: Node) = {
+    container.innerHTML = ""
+    container.append(child)
+  }
 
   /** TODO - display this in an app footer
     *
@@ -125,13 +132,6 @@ trait HtmlUtils {
         dom.window.console.log(s"Couldn't get value for '$id': $err")
         ""
     }
-  }
-
-  def appendPar(targetNode: dom.Node, text: String): Unit = {
-    val parNode: Element = dom.document.createElement("p")
-    val textNode         = document.createTextNode(text)
-    parNode.appendChild(textNode)
-    targetNode.appendChild(parNode)
   }
 
   def mouseMove(pre: html.Pre) = {

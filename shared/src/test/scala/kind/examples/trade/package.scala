@@ -1,8 +1,5 @@
 package kind.examples
 
-import zio.*
-import scala.concurrent.duration.*
-
 /** This package is an example of more non-trivial examples.
   *
   * A restaurant which will automatically re-order ingredients when they run low, and a marketplace

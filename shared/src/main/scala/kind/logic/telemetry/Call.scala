@@ -1,7 +1,7 @@
 package kind.logic.telemetry
 
-import kind.logic.*
-import zio.*
+import kind.logic._
+import zio._
 
 /** Represents a Call invocation -- something we'd want to capture in our archtiecture (i.e. a
   * sequence diagram describing our system)

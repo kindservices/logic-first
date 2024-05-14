@@ -1,10 +1,10 @@
 package kind.logic
 
-import zio.*
+import zio._
 
-import telemetry.*
 import scala.annotation.targetName
-import scala.reflect.ClassTag
+
+import telemetry._
 
 /** This trait is a kind of convenience wrapper around our 'Program' ADT, providing the common (but
   * perhaps unfamiliar or confusing) 'foldMap' machinery we need to execute our program.

@@ -1,7 +1,5 @@
 package kind.examples.trade
 
-import kind.logic.*
-
 package object restaurant {
 
   // we perhaps have an enum of ingredients (there are only so many things) which can be used to make food

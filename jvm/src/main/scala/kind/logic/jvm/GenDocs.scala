@@ -1,6 +1,7 @@
 package kind.logic.jvm
 
-import eie.io.{given, *}
+import eie.io.{_, given}
+
 import scala.language.implicitConversions
 
 case class Scenario[A](title: String, input: A, genMermaid: A => String, subDir: String = "") {

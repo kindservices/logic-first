@@ -1,19 +1,12 @@
 package kind.logic.js.scenarios
 
-import org.scalajs.dom.html.{Div, Input}
-import org.scalajs.dom.{MouseEvent, document, html, window}
-import scalatags.JsDom.all.*
-import scalatags.JsDom.tags2.section
+import kind.logic.js._
+import org.scalajs.dom.MouseEvent
+import scalatags.JsDom.all._
 
-import kind.logic.js.*
-import java.time.format.DateTimeFormatter
-import java.time.{ZoneId, ZonedDateTime}
-import scala.scalajs.js.annotation.*
-import org.scalajs.dom.HTMLParagraphElement
-import scala.util.chaining.*
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration.*
+import scala.concurrent.Future
+import scala.util.chaining._
 case class ScenarioBuilder() {
 
   private def onDelete() = {
@@ -105,7 +98,7 @@ case class ScenarioBuilder() {
     TestScenario(nameInput.value, descriptionInput.value, jsonInput.value.asUJson)
 
   private def onSaveAsOk() = {
-    val input = jsonInput.value
+    jsonInput.value
 
     val scenario = currentScenarioFromInput()
     // no validation! naughty...
