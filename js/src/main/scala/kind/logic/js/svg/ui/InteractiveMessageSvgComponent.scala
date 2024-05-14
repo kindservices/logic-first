@@ -110,7 +110,7 @@ class InteractiveMessageSvgComponent(
   private def onTick() = {
 
     if playing then {
-      val currentTime = timeSlider.value.toInt
+      val currentTime = timeSlider.value.toIntOption.getOrElse(0)
       val newTime     = currentTime + playIncrement
       if newTime >= timeSlider.max.toInt then {
         playing = false

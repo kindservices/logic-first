@@ -24,7 +24,7 @@ object LocalState {
   // TODO = there's a better way to do this, but we allow our top-level app to update this
   var defaultPaths: Map[String, TestScenario] = Map.empty
 
-  def addDefaultScenario(testScenario : TestScenario) = {
+  def addDefaultScenario(testScenario: TestScenario) = {
     defaultPaths = defaultPaths.updated(testScenario.name, testScenario)
   }
 

@@ -40,43 +40,28 @@ object AppSkeleton {
 //   page.element
 // }
 
-// def interactiveAsRestaurant(scenario: TestScenario): Option[HTMLDivElement] = {
+// def pizzaAsSvg(scenario: TestScenario): Option[HTMLDivElement] = {
 //   try {
-//     val request = read[OrderData](scenario.input)
-
+//     val request                = scenario.inputAs[MakePizzaRequest](scenario.input)
 //     given telemetry: Telemetry = Telemetry()
-
-//     val result = RestaurantDefaultLogic.newRestaurant.placeOrder(request.asOrder).execOrThrow()
-//     val calls: Seq[CompletedCall] = telemetry.calls.execOrThrow()
-//     val messages                  = kind.logic.js.svg.SvgForCalls(calls)
-//     // TODO - scale the config based on the div size
-//     val actors = calls.flatMap(c => Set(c.source, c.target))
-//     val config = ui.Config.default()
-//     Option(InteractiveComponent(actors, messages, config))
-
+//     val result =
+//       PizzaOps.defaultProgram.orderPizza(request.quantity, request.toppings).execOrThrow()
+//     val calls = telemetry.calls.execOrThrow()
+//     Option(SvgForCalls(calls))
 //   } catch {
 //     case NonFatal(e) =>
+//       println(s"Error creating svg: $e")
 //       None
 //   }
 // }
 
-// lazy val interactivePage = {
-//   val page: HTMLDivElement = div().render
-
+// def initSvg() = {
 //   EventBus.activeTestScenario.subscribe { scenario =>
-//     val tryOne = interactiveAsDraftContract(scenario)
-
-//     val tryTwo = interactiveAsRestaurant(scenario)
-
-//     val fallback = div(s"We couldn't parse the scenario as a DraftContract or Restaurant").render
-
-//     val component = tryOne.orElse(tryTwo).getOrElse(fallback)
-
-//     page.innerHTML = ""
-//     page.appendChild(component)
-
+//     def fallback  = div(s"We couldn't parse the scenario as a DraftContract or Restaurant").render
+//     val component = pizzaAsSvg(scenario).getOrElse(fallback)
+//     AppSkeleton.svgPage.innerHTML = ""
+//     AppSkeleton.svgPage.appendChild(component)
 //   }
-//   page
 // }
 
 @JSExportTopLevel("createScenarioBuilder")

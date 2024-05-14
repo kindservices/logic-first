@@ -55,7 +55,8 @@ package object js {
       input: Json = ujson.Null,
       lastResult: Option[TestResult] = None
   ) derives ReadWriter {
-    def asJson: Value = writeJs(this)
+    def asJson: Value  = writeJs(this)
+    def inputAs[A: RW] = read[A](input)
   }
 
   object TestScenario {

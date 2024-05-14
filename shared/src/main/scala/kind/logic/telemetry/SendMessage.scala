@@ -17,6 +17,10 @@ case class SendMessage(
 ) {
   def endTimestamp = timestamp + duration.toMillis
 
+  def timestampInNanos    = timestamp * 1000000
+  def endTimestampInNanos = timestampInNanos + duration.toNanos
+  def durationInNanos     = duration.toNanos
+
   def isActiveAt(time: Long) = timestamp <= time && time <= timestamp + duration.toMillis
 
   def messageFormatted = message match {
@@ -34,14 +38,34 @@ case class SendMessage(
 }
 
 object SendMessage {
-  def test = SendMessage(
-    Actor.person("foo", "dave"),
-    Actor.person("bar", "carl"),
-    1234,
-    10.seconds,
-    "-->>",
-    ujson.Obj("hello" -> "world")
-  )
+
+  /** Adjust the timestamps so that the timestamps and durations fit in the given duration
+    *
+    * @param messages
+    *   the messages to scale
+    * @param fitTo
+    *   the desired time duration
+    * @return
+    *   the scaled messages
+    */
+  def scaleToFit(messages: Seq[SendMessage], fitTo: FiniteDuration): Seq[SendMessage] = {
+    if messages.isEmpty then return messages
+
+    val fromTimeNanos = messages.map(_.timestampInNanos).min
+    val scaleFactor = {
+      val toTimeNanos = messages.map(_.endTimestampInNanos).max
+
+      fitTo.toNanos.toDouble / (toTimeNanos - fromTimeNanos)
+    }
+
+    messages.map { msg =>
+      val scaledDelta = ((msg.timestampInNanos - fromTimeNanos) * scaleFactor).toLong
+      msg.copy(
+        timestamp = fromTimeNanos + scaledDelta,
+        duration = (msg.durationInNanos * scaleFactor).toLong.nanos
+      )
+    }
+  }
 
   /** This recursive function walks through the calls, keeping track of which participants are
     * currently active.

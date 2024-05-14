@@ -10,7 +10,7 @@ import scalatags.JsDom.implicits.given
 
 import scala.concurrent.duration.{*, given}
 
-object InteractiveComponent {
+object SvgComponent {
   def apply(actors: Seq[Actor], messages: Seq[SendMessage], config: Config = Config.default()) = {
     val systemActorLayout = SystemActorsLayout(actors.toSet, config)
 
