@@ -40,7 +40,7 @@ case class MermaidPage() {
   ).render
 
   // Append the elements to the body
-  def element = div(style := "background-color: white", diagramDiv).render
+  def element = div(diagramDiv).render
 
   private def renderDiagram(markdown: String): Unit = {
     val newTargetNode = updateDiagramComment(markdown)
