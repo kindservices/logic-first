@@ -1,4 +1,4 @@
-package kind.logic.js.table
+package kind.logic.js.db
 
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
