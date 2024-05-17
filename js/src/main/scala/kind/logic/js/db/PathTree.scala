@@ -1,12 +1,17 @@
 package kind.logic.js.db
 
+/** This represents a basic file-system-like tree structure, where each node can have data
+  *
+  * @param children
+  *   the child nodes for this node
+  * @param data
+  *   the data at this node
+  */
 case class PathTree(children: Map[String, PathTree] = Map.empty, data: Json = ujson.Null) {
   def add(child: String, data: Json = ujson.Null) = {
     val newChild = PathTree(data = data)
     copy(children = children + (child -> newChild))
   }
-
-  // override def toString = pretty(Nil).mkString("\n")
 
   def formatted = pretty().mkString("\n")
 

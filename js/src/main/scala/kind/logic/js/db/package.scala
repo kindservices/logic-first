@@ -55,7 +55,7 @@ package object db {
     json match {
       case obj: Obj =>
         obj.value.flatMap { case (k, v) =>
-          val newKey = if (parentKey.isEmpty) k else s"$parentKey.$k"
+          val newKey = if parentKey.isEmpty then k else s"$parentKey.$k"
           flattenJsonStr(v, newKey)
         }.toMap
 

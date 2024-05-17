@@ -34,7 +34,7 @@ case class Drawer(parent: HTMLElement) {
     * @return
     *   nowt - this updates the components in-place
     */
-  def refresh(inactiveTabs: Set[UIComponent] = UIComponent.values.toSet) = {
+  def refresh(inactiveTabs: Set[UIComponent] = UIComponent.values()) = {
     parent.innerHTML = ""
 
     def add(title: String, function: String) = {
@@ -52,13 +52,13 @@ case class Drawer(parent: HTMLElement) {
       myLayout.createDragSource(item, config)
     }
 
-    UIComponent.values.filter(inactiveTabs.contains).foreach { c =>
+    UIComponent.values().filter(inactiveTabs.contains).foreach { c =>
       add(c.name, c.function)
     }
   }
 
   EventBus.activeTabs.subscribe { tabs =>
-    val inactive = UIComponent.values.toSet -- tabs
+    val inactive = UIComponent.values() -- tabs
     refresh(inactive)
   }
 }
