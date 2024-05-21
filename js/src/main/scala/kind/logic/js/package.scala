@@ -18,9 +18,6 @@ import ujson.Value
 package object js {
   type Json = ujson.Value
 
-  /** This layout is exported in main.js for us to reference here */
-  def myLayout = scala.scalajs.js.Dynamic.global.window.myLayout
-
   extension (container: scala.scalajs.js.Dynamic) {
     def placeholder(name: String, state: scala.scalajs.js.Dynamic) = {
       container.title = name

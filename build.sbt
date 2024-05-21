@@ -68,7 +68,7 @@ lazy val app = crossProject(JSPlatform, JVMPlatform).in(file(".")).
   ).
   jsSettings(
     name := "logic-first-js",
-    scalaJSUseMainModuleInitializer := true,
+    // scalaJSUseMainModuleInitializer := true,
     libraryDependencies ++= Seq(
       "io.github.cquiroz" %%% "scala-java-time" % "2.5.0",
       "com.lihaoyi" %%% "scalatags" % "0.12.0",

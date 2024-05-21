@@ -1,5 +1,6 @@
 package kind.logic.js
 
+import kind.logic.js.goldenlayout.*
 import kind.logic.js.scenarios.*
 import kind.logic.js.svg.*
 import kind.logic.js.mermaid.MermaidPage
@@ -24,7 +25,7 @@ import scala.scalajs.js.annotation.JSExportTopLevel
   * @param parent
   *   the parent element
   */
-case class Drawer(parent: HTMLElement) {
+case class Drawer(parent: HTMLElement, myLayout: GoldenLayout) {
 
   /** The idea is that we can remove elements based on the current state of which apps have been
     * added

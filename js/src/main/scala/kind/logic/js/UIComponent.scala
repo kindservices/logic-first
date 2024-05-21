@@ -7,36 +7,35 @@ import scala.collection.MapView
   * To add new UIComponents to the menu, we need to:
   *
   * #1 create a function with the following signature and export with JSExportTopLevel
-  * 
+  *
   * {{{
   * @scala.scalajs.js.annotation.JSExportTopLevel("createDb")
-  * def createDb(container: scala.scalajs.js.Dynamic, state: scala.scalajs.js.Dynamic) = { 
+  * def createDb(container: scala.scalajs.js.Dynamic, state: scala.scalajs.js.Dynamic) = {
   *   val db = TableComponent(Map("foo" -> ujson.read("""{"bar": 1}""")))
   *   container.replace(db.element.execOrThrow())
   * }
   * }}}
-  * 
+  *
   * #2 register the component with UIComponent.register so the Drawer knows about it
   * {{{
   *  UIComponent.register(UIComponent("DB", "createDb"))
   * }}}
-  * 
+  *
   * #3 Export the function in the window global scope:
   * {{{
   *  global.window.createScenarioBuilder = createDb
   * }}}
-  * 
-  * #4
-  * Register the function with GoldenLayer in index.html
+  *
+  * #4 Register the function with GoldenLayer in index.html
   * {{{
-  * 
+  *
   * myLayout.registerComponent('createDb', function(container, state) {
   *      createDb(container, state);
   * });
   * }}}
   *
   * NOTE: We could eliminate step 3 and 4 if we taught UIComponent about window.global.myLayout!
-  * 
+  *
   * We can drag them onto the screen
   *
   * @param name

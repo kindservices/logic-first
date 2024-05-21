@@ -114,7 +114,15 @@ class InteractiveMessageSvgComponent(
     if playing then {
       val currentTime = timestampSliderValue.asNanos
       val newTime     = currentTime + playIncrement
-      if newTime >= timeSlider.max.toInt then {
+      val maxTime = timeSlider.max.toLongOption.getOrElse {
+
+        println(
+          s"Failed to parse maxTime: ${timeSlider.max}. newTime     = currentTime ($currentTime) + playIncrement $playIncrement"
+        )
+        0L
+      }
+
+      if newTime >= maxTime then {
         playing = false
       }
       timeSlider.value = s"${newTime}"

@@ -64,21 +64,21 @@ object AppSkeleton {
 //   }
 // }
 
-@JSExportTopLevel("createScenarioBuilder")
-def createScenarioBuilder(container: scala.scalajs.js.Dynamic, state: scala.scalajs.js.Dynamic) =
-  container.replace(ScenarioBuilder().content)
+// @JSExportTopLevel("createScenarioBuilder")
+// def createScenarioBuilder(container: scala.scalajs.js.Dynamic, state: scala.scalajs.js.Dynamic) =
+//   container.replace(ScenarioBuilder().content)
 
-@JSExportTopLevel("createSequenceDiagram")
-def createSequenceDiagram(container: scala.scalajs.js.Dynamic, state: scala.scalajs.js.Dynamic) =
-  container.replace(AppSkeleton.mermaidPage.element)
+// @JSExportTopLevel("createSequenceDiagram")
+// def createSequenceDiagram(container: scala.scalajs.js.Dynamic, state: scala.scalajs.js.Dynamic) =
+//   container.replace(AppSkeleton.mermaidPage.element)
 
-@JSExportTopLevel("createInteractivePage")
-def createInteractivePage(container: scala.scalajs.js.Dynamic, state: scala.scalajs.js.Dynamic) =
-  container.replace(AppSkeleton.svgPage)
+// @JSExportTopLevel("createInteractivePage")
+// def createInteractivePage(container: scala.scalajs.js.Dynamic, state: scala.scalajs.js.Dynamic) =
+//   container.replace(AppSkeleton.svgPage)
 
-@JSExportTopLevel("createDiffPage")
-def createDiffPage(container: scala.scalajs.js.Dynamic, state: scala.scalajs.js.Dynamic) =
-  container.placeholder("Diff", state)
+// @JSExportTopLevel("createDiffPage")
+// def createDiffPage(container: scala.scalajs.js.Dynamic, state: scala.scalajs.js.Dynamic) =
+//   container.placeholder("Diff", state)
 
 // this is used to update the menu
 @JSExportTopLevel("onComponentCreated")
@@ -88,15 +88,15 @@ def onComponentCreated(id: String) = UIComponent.byFunction(id).foreach(EventBus
 def onComponentDestroyed(id: String) =
   UIComponent.byFunction(id).foreach(EventBus.tabClosed.publish)
 
-@main
-def layout(): Unit = {
-  new Drawer(HtmlUtils.$("drawer")).refresh()
+// @main
+// def layout(): Unit = {
+//   new Drawer(HtmlUtils.$("drawer")).refresh()
 
-  global.window.createScenarioBuilder = createScenarioBuilder
-  global.window.createSequenceDiagram = createSequenceDiagram
-  global.window.createInteractivePage = createInteractivePage
-  global.window.createDiffPage = createDiffPage
+//   global.window.createScenarioBuilder = createScenarioBuilder
+//   global.window.createSequenceDiagram = createSequenceDiagram
+//   global.window.createInteractivePage = createInteractivePage
+//   global.window.createDiffPage = createDiffPage
 
-  global.window.onComponentDestroyed = onComponentDestroyed
-  global.window.onComponentCreated = onComponentCreated
-}
+//   global.window.onComponentDestroyed = onComponentDestroyed
+//   global.window.onComponentCreated = onComponentCreated
+// }
