@@ -62,4 +62,10 @@ package object js {
   // for each stack in a test call frame, there is an input and an output
   type StackElement = (Json, Json)
 
+
+  global.window.initLayout = initLayout
+  global.window.createNewComponent = createNewComponent
+
+  global.window.onComponentDestroyed = onComponentDestroyed
+  global.window.onComponentCreated = onComponentCreated
 }
