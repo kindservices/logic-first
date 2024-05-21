@@ -2,6 +2,7 @@ package kind.logic.js.db
 
 import zio.*
 import kind.logic.js.*
+import kind.logic.json.*
 import scalatags.JsDom.all.*
 import org.scalajs.dom.*
 

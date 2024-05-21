@@ -1,9 +1,9 @@
-package kind.logic.js
+package kind.logic
 
 import ujson.*
 import util.control.NonFatal
 
-package object db {
+package object json {
   type Json = ujson.Value
 
   type JKey  = String | Int
