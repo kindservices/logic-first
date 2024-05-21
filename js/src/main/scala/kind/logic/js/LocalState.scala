@@ -1,9 +1,11 @@
 package kind.logic.js
 
 import org.scalajs.dom
-import scala.util.control.NonFatal
-import concurrent.Future
+
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.control.NonFatal
+
+import concurrent.Future
 
 /** Contains stuff we need for the UI
   */

@@ -1,26 +1,21 @@
 package kind.logic.js.svg.ui
 
-import kind.logic.js.svg.*
-import kind.logic.*
-import kind.logic.telemetry.*
+import kind.logic._
 import kind.logic.color.Colors
-
-import scala.scalajs.js
-import scala.scalajs.js.annotation.*
+import kind.logic.js.svg._
+import kind.logic.telemetry._
 import org.scalajs.dom
-import scalatags.JsDom
-import scalatags.JsDom.svgTags as stags
-import scalatags.JsDom.svgTags.*
-import scalatags.JsDom.svgAttrs.*
-import scalatags.JsDom.implicits.{*, given}
-
-import scala.scalajs.js.annotation.*
-import scala.concurrent.duration.{*, given}
-import scala.collection.MapView
-import scalatags.JsDom.TypedTag
 import org.scalajs.dom.Element
 import org.scalajs.dom.SVGCircleElement
 import org.scalajs.dom.SVGTextElement
+import scalatags.JsDom
+import scalatags.JsDom.implicits._
+import scalatags.JsDom.svgAttrs._
+import scalatags.JsDom.svgTags._
+import scalatags.JsDom.{svgTags => stags}
+
+import scala.concurrent.duration._
+import scala.scalajs.js
 
 object MessageLayout:
 

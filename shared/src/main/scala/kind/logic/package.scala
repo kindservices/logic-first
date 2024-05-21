@@ -1,8 +1,6 @@
 package kind
-import zio.*
-import kind.logic.telemetry.*
-import scala.util.NotGiven
-import scala.concurrent.duration.FiniteDuration
+import kind.logic.telemetry._
+import zio._
 
 package object logic {
 

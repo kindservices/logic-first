@@ -1,8 +1,7 @@
-package kind.logic.js.db
+package kind.logic.json
 
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
-import upickle.default.*
 
 class PathTreeTest extends AnyWordSpec with Matchers {
   "PathTree.update" should {

@@ -1,6 +1,7 @@
 package kind.logic
 
-import ujson.*
+import ujson._
+
 import util.control.NonFatal
 
 package object json {

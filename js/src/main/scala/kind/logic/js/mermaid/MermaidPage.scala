@@ -1,13 +1,13 @@
 package kind.logic.js.mermaid
 
+import kind.logic.js.TestScenario
 import org.scalajs.dom
-import org.scalajs.dom.{Node, document, html}
-import scalatags.JsDom.all.*
-import ujson.Value
+import org.scalajs.dom.Node
+import org.scalajs.dom.document
+import scalatags.JsDom.all._
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.*
-import kind.logic.js.TestScenario
+import scala.scalajs.js.annotation._
 
 @js.native
 @JSGlobal("renderMermaid")

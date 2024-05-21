@@ -1,9 +1,7 @@
 package kind.logic.js.svg.ui
 
-import kind.logic.js.svg.*
 import kind.logic.Actor
-import scalatags.JsDom
-import scalatags.JsDom.TypedTag
+import kind.logic.js.svg._
 import org.scalajs.dom.Node
 
 /** This class encapsulates the logic for laying out the system actors (the databases, people,
@@ -31,15 +29,5 @@ object SystemActorsLayout {
 
   /** given a center point, lay out N points around it in a circle
     */
-  private def pointsAroundCenterpoint(center: Point, radius: Int, n: Int): List[(Int, Int)] = {
-    import center.*
-    val angle = 2 * Math.PI / n
-    (0 until n)
-      .map(i => {
-        val newX = x + radius * Math.cos(i * angle)
-        val newY = y + radius * Math.sin(i * angle)
-        (newX.toInt, newY.toInt)
-      })
-      .toList
-  }
+
 }

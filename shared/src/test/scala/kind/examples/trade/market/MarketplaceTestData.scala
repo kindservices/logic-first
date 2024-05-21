@@ -1,6 +1,6 @@
 package kind.examples.trade.market
 
-import kind.logic.{given, *}
+import kind.logic.*
 import kind.logic.telemetry.*
 import kind.examples.trade.*
 import kind.examples.trade.market.MarketplaceLogic.*

@@ -1,10 +1,11 @@
 package kind.logic.js
 
-import kind.logic.*
+import kind.logic._
+
 import scala.collection.mutable.HashMap
-import scala.util.chaining.*
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+import scala.util.chaining._
 
 /** poor-man's event bus
   */

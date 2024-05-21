@@ -1,8 +1,5 @@
 package kind.logic.js.svg
 
-import kind.logic.{Actor, ActorType}
-import kind.logic.color.Colors
-
 package object ui {
 
   case class Point(x: Int, y: Int)

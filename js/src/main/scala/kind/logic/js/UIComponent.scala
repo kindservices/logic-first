@@ -1,7 +1,5 @@
 package kind.logic.js
 
-import scala.collection.MapView
-
 /** UI Components are things we can represent in the menu.
   *
   * To add new UIComponents to the menu, we need to:

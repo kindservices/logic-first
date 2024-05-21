@@ -1,11 +1,13 @@
 package kind.logic.js
 
-import java.util.UUID
 import org.scalajs.dom
+import org.scalajs.dom._
+import org.scalajs.dom.document
+import org.scalajs.dom.html
 import org.scalajs.dom.html.Div
-import org.scalajs.dom.*
-import org.scalajs.dom.{document, html, window}
+import org.scalajs.dom.window
 
+import java.util.UUID
 import scala.collection.immutable
 import scala.reflect.ClassTag
 import scala.util.control.NonFatal

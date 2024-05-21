@@ -1,6 +1,5 @@
-package kind.logic.js.db
-
-import upickle.default.*
+package kind.logic.json
+import upickle.default._
 
 /** This represents a basic file-system-like tree structure, where each node can have data
   *

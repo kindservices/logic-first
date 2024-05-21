@@ -1,9 +1,10 @@
 package kind.logic.js.svg
 
-import kind.logic.*
-import kind.logic.telemetry.*
+import kind.logic._
+import kind.logic.telemetry._
 import org.scalajs.dom.HTMLDivElement
-import scala.concurrent.duration.*
+
+import scala.concurrent.duration._
 
 object SvgForCalls {
 

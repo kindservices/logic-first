@@ -1,4 +1,5 @@
 import org.scalajs.linker.interface.ModuleSplitStyle
+// import scalafix.sbt.ScalafixPlugin.autoImport.*
 
 val githubUser = "kindservices"
 val githubRepo = "logic-first"
@@ -20,6 +21,9 @@ ThisBuild / developers := List(
 )
 ThisBuild / publishTo := Some("GitHub Package Registry" at s"https://maven.pkg.github.com/$githubUser/$githubRepo")
 
+ThisBuild / semanticdbEnabled := true
+ThisBuild / semanticdbVersion := scalafixSemanticdb.revision
+
 ThisBuild / version := {
   val buildNr = {
     val runNumber = sys.env.getOrElse("GITHUB_RUN_NUMBER", "0").toInt
@@ -34,6 +38,8 @@ ThisBuild / version := {
   else
     s"$baseVersion-SNAPSHOT"
 }
+
+// ThisBuild / compile in Compile := (compile in Compile).dependsOn(scalafixAll).value
 
 // Common settings
 lazy val commonSettings = Seq(
@@ -54,7 +60,8 @@ ThisBuild / scalacOptions ++= Seq(
   "-feature",
   "-unchecked",
   "-rewrite",
-  "-new-syntax"
+  "-new-syntax",
+  "-Wunused:all"
 )
 
 lazy val app = crossProject(JSPlatform, JVMPlatform).in(file(".")).

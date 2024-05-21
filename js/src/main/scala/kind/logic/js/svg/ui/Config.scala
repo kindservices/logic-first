@@ -1,7 +1,8 @@
 package kind.logic.js.svg.ui
 
-import scala.concurrent.duration.*
 import org.scalajs.dom
+
+import scala.concurrent.duration._
 case class ActorConfig(
     // how much further down should the actor labels be from the actor icon?
     labelYOffset: Int = 40,

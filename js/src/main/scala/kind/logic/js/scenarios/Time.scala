@@ -1,13 +1,12 @@
 package kind.logic.js.scenarios
 
-import org.scalajs.dom.html.Div
-import org.scalajs.dom.{MouseEvent, window}
-import org.scalajs.dom.html.{Div, Input}
-import scalatags.JsDom.all.*
+import org.scalajs.dom.window
 
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import concurrent.duration.*
-import java.time.{ZoneId, ZonedDateTime}
+
+import concurrent.duration._
 
 object Time:
 

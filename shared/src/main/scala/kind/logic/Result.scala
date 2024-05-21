@@ -1,6 +1,6 @@
 package kind.logic
 
-import zio.*
+import zio._
 
 enum Result[A]:
   case RunTask(job: Task[A])                                             extends Result[A]

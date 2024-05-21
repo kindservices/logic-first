@@ -1,19 +1,12 @@
 package kind.logic.js.svg.ui
 
-import scala.scalajs.js
-import scala.scalajs.js.annotation.*
 import org.scalajs.dom
-import scalatags.JsDom
-
-// import scalatags.JsDom.all.*
-import scalatags.JsDom.{svgTags => stags}
-import scalatags.JsDom.svgTags.*
-import scalatags.JsDom.svgAttrs.*
-import scalatags.JsDom.implicits.{given, *}
-
-import scala.scalajs.js.annotation.*
-import scala.concurrent.duration.{given, *}
 import org.scalajs.dom.Element
+import scalatags.JsDom
+import scalatags.JsDom.implicits.{_, given}
+import scalatags.JsDom.svgAttrs._
+import scalatags.JsDom.svgTags._
+import scalatags.JsDom.{svgTags => stags}
 
 /** 🤮🤮🤮 Chuffing SVG's layout of an arc sucks.... you have to give it points on the arc, the
   * radius, and ...🤮🤮🤮

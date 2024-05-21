@@ -1,10 +1,10 @@
 package kind.logic.js.db
 
-import zio.*
-import kind.logic.js.*
-import kind.logic.json.*
-import scalatags.JsDom.all.*
-import org.scalajs.dom.*
+import kind.logic.js._
+import kind.logic.json._
+import org.scalajs.dom._
+import scalatags.JsDom.all._
+import zio._
 
 /** @param identifier
   *   an ID for this database (so we can send relevant notifications)

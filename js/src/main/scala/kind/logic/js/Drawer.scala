@@ -1,18 +1,11 @@
 package kind.logic.js
 
-import kind.logic.js.goldenlayout.*
-import kind.logic.js.scenarios.*
-import kind.logic.js.svg.*
-import kind.logic.js.mermaid.MermaidPage
+import kind.logic.js.goldenlayout._
 import org.scalajs.dom
-import scalatags.JsDom.all.*
-import org.scalajs.dom.{HTMLElement, Node, document, html}
+import org.scalajs.dom.HTMLElement
+import scalatags.JsDom.all._
 
-import scala.scalajs.js.Dynamic.{global => g, literal => lit}
-import scala.concurrent.Future
-import scala.concurrent.duration.given
 import scala.scalajs.js.JSON
-import scala.scalajs.js.annotation.JSExportTopLevel
 
 /** TODO:
   * {{{

@@ -1,6 +1,5 @@
-package kind.logic.js.db
+package kind.logic.json
 
-import kind.logic.js.db.paths
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
 import ujson.*

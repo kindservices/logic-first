@@ -1,11 +1,10 @@
 package kind.logic.telemetry
 
-import kind.logic.*
-import kind.logic.color.*
-import zio.*
+import kind.logic._
+import kind.logic.color._
+import zio._
+
 import java.util.concurrent.TimeUnit
-import scala.reflect.ClassTag
-import scala.concurrent.duration.{given, *}
 
 /** Telemetry is a trait which allows us to track the calls made in our system, which we can later
   * use to show what happened

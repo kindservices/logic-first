@@ -1,21 +1,12 @@
 package kind.logic.js
 
-import kind.logic.*
-import kind.logic.js.svg.*
-import kind.logic.telemetry.*
-import kind.logic.js.scenarios.*
-import kind.logic.js.mermaid.*
+import kind.logic._
+import kind.logic.js.mermaid._
 import org.scalajs.dom
-import scalatags.JsDom.all.*
-import org.scalajs.dom.*
+import org.scalajs.dom._
+import scalatags.JsDom.all._
 
-import scala.scalajs.js.Dynamic.global
-import scala.concurrent.Future
-import scala.concurrent.duration.given
-import scala.scalajs.js.JSON
 import scala.scalajs.js.annotation.JSExportTopLevel
-import upickle.default.*
-import scala.util.control.NonFatal
 
 object AppSkeleton {
 

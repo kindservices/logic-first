@@ -6,7 +6,6 @@ import org.scalatest.wordspec.AnyWordSpec
 import kind.logic.*
 import kind.logic.telemetry.*
 import kind.examples.trade.*
-import zio.*
 
 class RestaurantTest extends AnyWordSpec with Matchers {
 

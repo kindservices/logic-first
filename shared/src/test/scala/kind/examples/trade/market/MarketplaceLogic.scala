@@ -1,7 +1,6 @@
 package kind.examples.trade.market
 
 import kind.logic.*
-import scala.compiletime.ops.string
 import scala.concurrent.duration.FiniteDuration
 
 opaque type Item = String

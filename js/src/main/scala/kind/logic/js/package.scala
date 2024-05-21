@@ -1,19 +1,12 @@
 package kind.logic
 
-import org.scalajs.dom.html.Div
-import org.scalajs.dom.{MouseEvent, window}
-import org.scalajs.dom.html.{Div, Input}
-import scalatags.JsDom.all.*
 import org.scalajs.dom.Node
-import scala.scalajs.js.JSON
-
-import java.time.format.DateTimeFormatter
-import concurrent.duration.*
-import java.time.{ZoneId, ZonedDateTime}
-
-import upickle.default.{ReadWriter => RW, macroRW}
-import upickle.default.*
+import scalatags.JsDom.all._
 import ujson.Value
+import upickle.default._
+import upickle.default.{ReadWriter => RW}
+
+import scala.scalajs.js.JSON
 
 package object js {
   type Json = ujson.Value
