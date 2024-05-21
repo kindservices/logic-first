@@ -1,5 +1,7 @@
 package kind.logic.js.db
 
+import upickle.default.*
+
 /** This represents a basic file-system-like tree structure, where each node can have data
   *
   * @param children
@@ -7,11 +9,14 @@ package kind.logic.js.db
   * @param data
   *   the data at this node
   */
-case class PathTree(children: Map[String, PathTree] = Map.empty, data: Json = ujson.Null) {
+case class PathTree(children: Map[String, PathTree] = Map.empty, data: Json = ujson.Null)
+    derives ReadWriter {
   def add(child: String, data: Json = ujson.Null) = {
     val newChild = PathTree(data = data)
     copy(children = children + (child -> newChild))
   }
+
+  def asJson = writeJs(this)
 
   def formatted = pretty().mkString("\n")
 
@@ -32,6 +37,14 @@ case class PathTree(children: Map[String, PathTree] = Map.empty, data: Json = uj
       case Seq()           => Option(this)
       case head +: theRest => children.get(head).flatMap(_.at(theRest))
     }
+  }
+
+  def patchData(
+      path: Seq[String],
+      newData: Json,
+      createIfNotFound: Boolean = true
+  ) = {
+    update(path, (t => t.copy(data = t.data.mergeWith(newData))), createIfNotFound)
   }
 
   def updateData(
@@ -63,7 +76,12 @@ case class PathTree(children: Map[String, PathTree] = Map.empty, data: Json = uj
 }
 
 object PathTree {
+
+  extension (path: String) {
+    def asPath = path.split("/").toSeq
+  }
+
   def apply(data: Json) = new PathTree(data = data)
 
-  def forPath(path: String) = PathTree().updateData(path.split("/").toSeq, ujson.Null, true)
+  def forPath(path: String) = PathTree().updateData(path.asPath, ujson.Null, true)
 }
