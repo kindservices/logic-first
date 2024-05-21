@@ -3,7 +3,7 @@ package kind.logic.js.svg.ui
 import org.scalajs.dom
 import org.scalajs.dom.Element
 import scalatags.JsDom
-import scalatags.JsDom.implicits.{_, given}
+import scalatags.JsDom.implicits._
 import scalatags.JsDom.svgAttrs._
 import scalatags.JsDom.svgTags._
 import scalatags.JsDom.{svgTags => stags}

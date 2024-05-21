@@ -1,7 +1,7 @@
 package kind.logic.js
 
-import kind.logic._
-
+import kind.logic.*
+import kind.logic.js.goldenlayout.UIComponent
 import scala.collection.mutable.HashMap
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

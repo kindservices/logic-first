@@ -13,13 +13,21 @@ import java.util.concurrent.TimeUnit
   */
 trait Telemetry(val callsStackRef: Ref[CallStack]) {
 
+  val DefaultMermaidStyle = """%%{init: {"theme": "dark", 
+"themeVariables": {"primaryTextColor": "grey", "secondaryTextColor": "black", "fontFamily": "Arial", "fontSize": 14, "primaryColor": "#3498db"}}}%%"""
+
+  def asMermaid(mermaidStyle: String = DefaultMermaidStyle): UIO[String] =
+    asMermaidDiagram(mermaidStyle).map { mermaidMarkdown =>
+      mermaidMarkdown
+        .replace("```mermaid", "")
+        .replace("```", "")
+        .trim
+    }
+
   /** @return
     *   a operation which will access the trace calls and render them as a mermaid block
     */
-  def asMermaidDiagram(
-      mermaidStyle: String = """%%{init: {"theme": "dark", 
-"themeVariables": {"primaryTextColor": "grey", "secondaryTextColor": "black", "fontFamily": "Arial", "fontSize": 14, "primaryColor": "#3498db"}}}%%"""
-  ): UIO[String] =
+  def asMermaidDiagram(mermaidStyle: String = DefaultMermaidStyle): UIO[String] =
     asMermaidSequenceDiagram.map(sd => s"\n```mermaid\n$mermaidStyle\n${sd}```\n")
 
   /** This is just the sequence block part of the mermaid diagram. See 'asMermaidDiagram' for the
