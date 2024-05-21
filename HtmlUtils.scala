@@ -2,7 +2,6 @@ package kind.logic.js
 
 import java.util.UUID
 import org.scalajs.dom
-import org.scalajs.dom.html.Div
 import org.scalajs.dom.*
 import org.scalajs.dom.{document, html, window}
 

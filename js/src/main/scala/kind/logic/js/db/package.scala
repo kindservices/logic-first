@@ -16,7 +16,7 @@ package object db {
         (aMap.get(key), bMap.get(key)) match {
           case (Some(aValue), Some(bValue)) =>
             val diff = diffValues(aValue, bValue)
-            if (diff == ujson.Obj()) None else Some(key -> diff)
+            if diff == ujson.Obj() then None else Some(key -> diff)
           case (Some(aValue), None) =>
             Some(key -> ujson.Obj("removed" -> aValue))
           case (None, Some(bValue)) =>
@@ -32,7 +32,7 @@ package object db {
         .zipWithIndex
         .flatMap { case ((aValue, bValue), idx) =>
           val diff = diffValues(aValue, bValue)
-          if (diff == ujson.Obj()) None else Some(idx.toString -> diff)
+          if diff == ujson.Obj() then None else Some(idx.toString -> diff)
         }
         .toMap
       ujson.Obj.from(diffs)
