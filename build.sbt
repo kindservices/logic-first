@@ -33,9 +33,9 @@ ThisBuild / version := {
     // this is my little hack. The run numbers always increase, an we want to reset them when
     // bump to the next version. To do that, we just subtract whatever the last build number was
     // before we incremented the minor version
-    runNumber - 16
+    runNumber - 39
   }
-  val baseVersion = s"0.3.$buildNr"
+  val baseVersion = s"0.4.$buildNr"
   if (sys.env.getOrElse("GITHUB_REF", "").contains("refs/heads/main"))
     baseVersion
   else
