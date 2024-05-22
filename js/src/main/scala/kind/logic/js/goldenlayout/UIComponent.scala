@@ -4,8 +4,32 @@ import kind.logic.js.EventBus
 import org.scalajs.dom.Node
 import kind.logic.json._
 
-/** These components know how to render themselves in the golden layout
-  *
+/** These components know how to render themselves in the golden layout.
+  * 
+  * This was created because there were too many things to change when adding new golden layout components:
+  *  $ registering them with golden layout
+  *  $ exporting the render function
+  *  $ keeping track of all the possible components
+  *  $ docs ... just yuck. Too much shit.
+  * 
+  * So instead, there is:
+  * $ our UIComponent which keeps track of all registerd compoents
+  * $ The extension method 'addMenuItem' on GoldenLayout for adding new UIComponents
+  * $ the kind.logic.js.createNewComponent then knows how to call the 'render' function for the right UIComponent
+  * 
+  * This makes the usage-site arguably lot simpler in your application.
+  * 
+  * You end up with something like this in your main block:
+  * {{{
+  *  @JSExportTopLevel("initLayout")
+  *  def initLayout(myLayout: GoldenLayout) = {
+  *   val svg = myLayout.addMenuItem(drawer, "SVG") { state =>
+  *      MainPage.svgContainer
+  *   }
+  * }}}
+  * 
+  * where the 'MainPage.svgContainer' typically creates (lazily) a div or something while also subscribing to events using the EventBus
+  * 
   * @param state
   * @param render
   */
