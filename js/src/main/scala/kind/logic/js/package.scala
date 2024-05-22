@@ -35,10 +35,14 @@ package object js {
         container.setTitle(s"${state.title}")
         container.replace(comp.render(stateJS))
       case None =>
+        // the component doesn't have an ID -- default to the first component
         kind.logic.js.goldenlayout.UIComponent.default() match {
           case Some(comp) =>
             container.setTitle(comp.title)
             container.replace(comp.render(stateJS))
+
+            // hide the menu item as we're about to show it (and this is outside of our EventBus.activeTabs)
+            comp.hideMenuItem()
           case None =>
             container.setTitle("Dev Usage Error: No components registered")
             container.replace(
