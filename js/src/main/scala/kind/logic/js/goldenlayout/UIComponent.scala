@@ -43,7 +43,10 @@ class UIComponent private (val menuItem: HTMLElement, val state: State, val rend
   private var previousDisplayValue = ""
 
   def hideMenuItem() = {
-    if previousDisplayValue.isEmpty then previousDisplayValue = menuItem.style.display
+    if previousDisplayValue.isEmpty then {
+      val previousValue = Option(menuItem.style.display).getOrElse("")
+      previousDisplayValue = if previousValue.isEmpty then "block" else previousValue
+    }
     menuItem.style.display = "none"
   }
 
