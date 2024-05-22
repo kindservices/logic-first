@@ -12,6 +12,13 @@ import kind.logic.json._
 class UIComponent(val state: State, val render: State => Node) {
   def id    = state("id").str
   def title = state("title").str
+
+  override def hashCode(): Int = state.hashCode
+  override def equals(other : Any): Boolean = other match {
+    case that: UIComponent => this.state == that.state
+    case _ => false
+  }
+  override def toString = s"UIComponent(${state.render(2)})"
 }
 
 object UIComponent {

@@ -24,7 +24,7 @@ ThisBuild / publishTo := Some("GitHub Package Registry" at s"https://maven.pkg.g
 ThisBuild / semanticdbEnabled := true
 ThisBuild / semanticdbVersion := scalafixSemanticdb.revision
 
-addCommandAlias("fixUnusedImports", ";scalafix RemoveUnused")
+addCommandAlias("removeUnusedImports", ";scalafix RemoveUnused")
 addCommandAlias("organiseImports", ";scalafix OrganizeImports")
 
 ThisBuild / version := {
