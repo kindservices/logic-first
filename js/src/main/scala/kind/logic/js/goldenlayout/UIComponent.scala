@@ -1,24 +1,22 @@
 package kind.logic.js.goldenlayout
 
 import kind.logic.js.EventBus
-import org.scalajs.dom.Node
+import org.scalajs.dom.{HTMLElement, Node}
 import kind.logic.json._
 
 /** These components know how to render themselves in the golden layout.
-  * 
-  * This was created because there were too many things to change when adding new golden layout components:
-  *  $ registering them with golden layout
-  *  $ exporting the render function
-  *  $ keeping track of all the possible components
-  *  $ docs ... just yuck. Too much shit.
-  * 
-  * So instead, there is:
-  * $ our UIComponent which keeps track of all registerd compoents
-  * $ The extension method 'addMenuItem' on GoldenLayout for adding new UIComponents
-  * $ the kind.logic.js.createNewComponent then knows how to call the 'render' function for the right UIComponent
-  * 
+  *
+  * This was created because there were too many things to change when adding new golden layout
+  * components: $ registering them with golden layout $ exporting the render function $ keeping
+  * track of all the possible components $ docs ... just yuck. Too much shit.
+  *
+  * So instead, there is: $ our UIComponent which keeps track of all registerd compoents $ The
+  * extension method 'addMenuItem' on GoldenLayout for adding new UIComponents $ the
+  * kind.logic.js.createNewComponent then knows how to call the 'render' function for the right
+  * UIComponent
+  *
   * This makes the usage-site arguably lot simpler in your application.
-  * 
+  *
   * You end up with something like this in your main block:
   * {{{
   *  @JSExportTopLevel("initLayout")
@@ -27,20 +25,36 @@ import kind.logic.json._
   *      MainPage.svgContainer
   *   }
   * }}}
-  * 
-  * where the 'MainPage.svgContainer' typically creates (lazily) a div or something while also subscribing to events using the EventBus
-  * 
+  *
+  * where the 'MainPage.svgContainer' typically creates (lazily) a div or something while also
+  * subscribing to events using the EventBus
+  *
+  * @param menuItem
+  *   the menuItem associated with this component
   * @param state
+  *   the initial component state (which will have 'id' and 'title', amongst other things)
   * @param render
+  *   the render function which gets called by kind.logic.js.createNewComponent
   */
-class UIComponent(val state: State, val render: State => Node) {
+class UIComponent private (val menuItem: HTMLElement, val state: State, val render: State => Node) {
   def id    = state("id").str
   def title = state("title").str
 
+  private var previousDisplayValue = ""
+
+  def hideMenuItem() = {
+    if previousDisplayValue.isEmpty then previousDisplayValue = menuItem.style.display
+    menuItem.style.display = "none"
+  }
+
+  def showMenuItem() = {
+    if previousDisplayValue.nonEmpty then menuItem.style.display = previousDisplayValue
+  }
+
   override def hashCode(): Int = state.hashCode
-  override def equals(other : Any): Boolean = other match {
+  override def equals(other: Any): Boolean = other match {
     case that: UIComponent => this.state == that.state
-    case _ => false
+    case _                 => false
   }
   override def toString = s"UIComponent(${state.render(2)})"
 }
@@ -53,11 +67,24 @@ object UIComponent {
 
   def default() = componentIds.values.headOption
 
-  def register(title: String, initialState: State, render: State => Node) = {
+  /** creates a new UIComponent and registers it globally.
+    *
+    * @param menuItem
+    * @param title
+    * @param initialState
+    * @param render
+    * @return
+    */
+  private[goldenlayout] def register(
+      menuItem: HTMLElement,
+      title: String,
+      initialState: State,
+      render: State => Node
+  ) = {
     val id    = s"elm-${title.filter(_.isLetterOrDigit)}-${componentIds.size}"
     val state = initialState.mergeWith(ujson.Obj("title" -> title, "id" -> id))
 
-    val comp = UIComponent(state, render)
+    val comp = UIComponent(menuItem, state, render)
     componentIds += id -> comp
     comp
   }

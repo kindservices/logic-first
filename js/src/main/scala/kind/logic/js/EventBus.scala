@@ -22,7 +22,6 @@ class EventBus[A] {
 
   def unsubscribe(key: String) = listenersById.remove(key)
 
-
   def subscribeToFutureEvents(onEvent: A => Unit): String = {
     id += 1
     id.toString.tap { id =>

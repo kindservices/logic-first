@@ -13,15 +13,19 @@ package object js {
 
   import scala.scalajs.js.annotation.JSExportTopLevel
 
-  /**
-    * This is our single function for rendered any new component, rather than the typical GoldenLayout way of doing it.
-    * 
-    * This was due to the amount of duplication/effort in having to export new functions, registerer them, etc.
-    * 
-    * See the docs on UIComponent and the GoldenLayout 'addMenuItem' extension function for more info.
+  /** This is our single function for rendered any new component, rather than the typical
+    * GoldenLayout way of doing it.
     *
-    * @param container the container of this component
-    * @param state the component state
+    * This was due to the amount of duplication/effort in having to export new functions, registerer
+    * them, etc.
+    *
+    * See the docs on UIComponent and the GoldenLayout 'addMenuItem' extension function for more
+    * info.
+    *
+    * @param container
+    *   the container of this component
+    * @param state
+    *   the component state
     */
   @JSExportTopLevel("createNewComponent")
   def createNewComponent(container: scala.scalajs.js.Dynamic, state: scala.scalajs.js.Dynamic) = {
@@ -37,7 +41,11 @@ package object js {
             container.replace(comp.render(stateJS))
           case None =>
             container.setTitle("Dev Usage Error: No components registered")
-            container.replace(div("Dev Usage Issue: No components registered. Use myLayout.addMenuItem(...) in your initLayout function").render)
+            container.replace(
+              div(
+                "Dev Usage Issue: No components registered. Use myLayout.addMenuItem(...) in your initLayout function"
+              ).render
+            )
         }
     }
   }
