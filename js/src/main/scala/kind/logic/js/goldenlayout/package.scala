@@ -10,7 +10,7 @@ package object goldenlayout {
 
   extension (myLayout: GoldenLayout) {
 
-    def add(
+    def addMenuItem(
         drawer: Node,
         title: String,
         initialState: State = ujson.Null,
