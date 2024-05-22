@@ -91,6 +91,18 @@ object UIComponent {
 
   private var active = Set[UIComponent]()
 
+  /** @return
+    *   all currnetly active components (as determined by the EventBus.tabOpen and
+    *   EventBus.tabClosed events)
+    */
+  def activeComponents(): Set[UIComponent] = active
+
+  /** @return
+    *   all currnetly inactive components (as determined by the EventBus.tabOpen and
+    *   EventBus.tabClosed events)
+    */
+  def inactiveComoponents(): Set[UIComponent] = componentIds.values.filterNot(active.contains).toSet
+
   EventBus.tabOpen.subscribe { c =>
     active += c
     EventBus.activeTabs.publish(active)
