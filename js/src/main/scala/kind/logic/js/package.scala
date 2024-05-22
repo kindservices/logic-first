@@ -4,14 +4,12 @@ import kind.logic.js.goldenlayout.UIComponent
 import scalatags.JsDom.all.*
 import org.scalajs.dom.Node
 import scala.scalajs.js.JSON
+import scala.scalajs.js.Dynamic.global
 
 import ujson.Value
 
 package object js {
   type Json = ujson.Value
-
-  /** This layout is exported in main.js for us to reference here */
-  // def myLayout = scala.scalajs.js.Dynamic.global.window.myLayout
 
   import scala.scalajs.js.annotation.JSExportTopLevel
 
@@ -62,10 +60,8 @@ package object js {
   // for each stack in a test call frame, there is an input and an output
   type StackElement = (Json, Json)
 
-
-  global.window.initLayout = initLayout
+  // these are used in index.html as we set up globallayout (e.g. myLayout)
   global.window.createNewComponent = createNewComponent
-
   global.window.onComponentDestroyed = onComponentDestroyed
   global.window.onComponentCreated = onComponentCreated
 }
