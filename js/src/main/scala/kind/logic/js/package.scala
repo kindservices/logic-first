@@ -60,7 +60,6 @@ package object js {
   @JSExportTopLevel("onComponentCreated")
   def onComponentCreated(id: String) = UIComponent.getOrFirst(id).foreach(EventBus.tabOpen.publish)
 
-
   // we use 'getOrFirst' as the default component won't have an ID
   @JSExportTopLevel("onComponentDestroyed")
   def onComponentDestroyed(id: String) =

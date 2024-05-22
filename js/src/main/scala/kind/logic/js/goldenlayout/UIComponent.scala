@@ -69,15 +69,17 @@ object UIComponent {
 
   private var componentIds = Map.empty[String, UIComponent]
 
-  /**
-    * @param id the component ID
-    * @return the component for the given ID
+  /** @param id
+    *   the component ID
+    * @return
+    *   the component for the given ID
     */
   def get(id: String) = componentIds.get(id)
 
-  /**
-    * @param id the component ID
-    * @return the component for the given ID, or the first component if none found
+  /** @param id
+    *   the component ID
+    * @return
+    *   the component for the given ID, or the first component if none found
     */
   def getOrFirst(id: String) = get(id).orElse(componentIds.values.headOption)
 
