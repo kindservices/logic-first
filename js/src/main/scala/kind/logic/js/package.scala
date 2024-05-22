@@ -55,13 +55,16 @@ package object js {
     }
   }
 
-// this is used to update the menu
+// this is used to update the menu.
+// we use 'getOrFirst' as the default component won't have an ID
   @JSExportTopLevel("onComponentCreated")
-  def onComponentCreated(id: String) = UIComponent.get(id).foreach(EventBus.tabOpen.publish)
+  def onComponentCreated(id: String) = UIComponent.getOrFirst(id).foreach(EventBus.tabOpen.publish)
 
+
+  // we use 'getOrFirst' as the default component won't have an ID
   @JSExportTopLevel("onComponentDestroyed")
   def onComponentDestroyed(id: String) =
-    UIComponent.get(id).foreach(EventBus.tabClosed.publish)
+    UIComponent.getOrFirst(id).foreach(EventBus.tabClosed.publish)
 
   extension (container: scala.scalajs.js.Dynamic) {
     def placeholder(name: String, state: scala.scalajs.js.Dynamic) = {

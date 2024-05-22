@@ -48,7 +48,7 @@ class UIComponent private (val menuItem: HTMLElement, val state: State, val rend
   def hideMenuItem() = {
     if previousDisplayValue.isEmpty then {
       val previousValue = Option(menuItem.style.display).getOrElse("")
-      previousDisplayValue = if previousValue.isEmpty then "block" else previousValue
+      previousDisplayValue = if previousValue.isEmpty then "flex" else previousValue
     }
     menuItem.style.display = "none"
   }
@@ -69,7 +69,17 @@ object UIComponent {
 
   private var componentIds = Map.empty[String, UIComponent]
 
+  /**
+    * @param id the component ID
+    * @return the component for the given ID
+    */
   def get(id: String) = componentIds.get(id)
+
+  /**
+    * @param id the component ID
+    * @return the component for the given ID, or the first component if none found
+    */
+  def getOrFirst(id: String) = get(id).orElse(componentIds.values.headOption)
 
   def default() = componentIds.values.headOption
 
