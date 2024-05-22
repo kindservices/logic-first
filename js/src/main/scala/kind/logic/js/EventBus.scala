@@ -31,9 +31,10 @@ class EventBus[A] {
   }
 
   def subscribe(onEvent: A => Unit): String = {
-    subscribeToFutureEvents(onEvent)
-    // publish the last event when subscribing
-    lastEvent.foreach(e => Future(onEvent(e)))
+    subscribeToFutureEvents(onEvent).tap { id =>
+      // publish the last event when subscribing
+      lastEvent.foreach(e => onEvent(e))
+    }
   }
 }
 
