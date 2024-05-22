@@ -42,6 +42,9 @@ class UIComponent private (val menuItem: HTMLElement, val state: State, val rend
 
   private var previousDisplayValue = ""
 
+  // this is part of the 'createNewComponent' and index.html "hack" that our first element doesn't have an ID
+  def notifyOpened() = EventBus.tabOpen.publish(this)
+
   def hideMenuItem() = {
     if previousDisplayValue.isEmpty then {
       val previousValue = Option(menuItem.style.display).getOrElse("")

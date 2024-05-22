@@ -42,7 +42,8 @@ package object js {
             container.replace(comp.render(stateJS))
 
             // hide the menu item as we're about to show it (and this is outside of our EventBus.activeTabs)
-            comp.hideMenuItem()
+            // this should then have the menu item hidden
+            comp.notifyOpened()
           case None =>
             container.setTitle("Dev Usage Error: No components registered")
             container.replace(
