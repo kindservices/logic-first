@@ -32,14 +32,16 @@ package object logic {
 
   /** Trace this call to the given 'target' service / database / whatever
     *
+    * @param source
+    *   where is this call coming from?
     * @param target
-    *   the business name (Actor) of the target we're calling
+    *   what is the target of this call?
     * @param input
     *   the input used in this request
     * @return
-    *   a 'pimped' task which will update the telemetry when run
+    *   a new task which updates the telemetry with the call data when run
     */
-  private def traceTask[A](job: Task[A], source: Actor, target: Actor, input: Any)(using
+  def traceTask[A](job: Task[A], source: Actor, target: Actor, input: Any)(using
       telemetry: Telemetry
   ): Task[A] = {
     for
