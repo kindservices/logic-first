@@ -59,10 +59,6 @@ abstract class RunnableProgram[F[_]](val logic: [A] => F[A] => Result[A])(using
     *   the Task result of this operation, with the side-effect of tracking the invocation
     */
   private def traceOnInput[A](operation: F[A]): Task[A] = {
-    onInput(operation) match {
-      case Result.RunTask(task) => task // don't add a telemetry call
-      case Result.TraceTask(targetCoords, job, inputOpt) =>
-        traceTask(job, appCoords, targetCoords, inputOpt.getOrElse(operation))
-    }
+    onInput(operation).asTask(appCoords, operation)
   }
 }

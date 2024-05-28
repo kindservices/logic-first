@@ -39,7 +39,7 @@ package object logic {
     * @return
     *   a 'pimped' task which will update the telemetry when run
     */
-  private def traceTask[A](job: Task[A], source: Actor, target: Actor, input: Any)(using
+  def traceTask[A](job: Task[A], source: Actor, target: Actor, input: Any)(using
       telemetry: Telemetry
   ): Task[A] = {
     for
