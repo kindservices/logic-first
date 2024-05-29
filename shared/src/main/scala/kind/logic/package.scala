@@ -22,6 +22,8 @@ package object logic {
     */
   extension [A](job: Task[A]) {
 
+    def asTry() : Try[A] = Try(execOrThrow())
+    
     def execOrThrow(): A = Unsafe.unsafe { implicit unsafe =>
       Runtime.default.unsafe.run(job).getOrThrowFiberFailure()
     }
