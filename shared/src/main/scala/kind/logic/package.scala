@@ -1,7 +1,7 @@
 package kind
 import kind.logic.telemetry._
 import zio._
-
+import scala.util.Try
 package object logic {
 
   opaque type Timestamp = Long
