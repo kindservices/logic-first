@@ -1,8 +1,8 @@
 package kind.logic.json
 
-import kind.logic._
+import kind.logic.*
 import ujson.Value
-import upickle.default._
+import upickle.default.*
 
 /** This represents a basic file-system-like tree structure, where each node can have data
   *
@@ -71,6 +71,23 @@ case class PathTree(children: Map[String, PathTree] = Map.empty, data: Json = uj
   }
 
   def formatted: String = pretty().mkString("\n")
+
+  /** @param path
+    *   the path to the given part in the tree
+    * @param filter
+    *   the text filter
+    * @return
+    *   the children at the given path which match the optional filter
+    */
+  def query(path: Seq[String], filter: Option[String] = None) = {
+    for
+      node  <- at(path).toSeq
+      child <- node.children.values
+      data  <- Option(child.data)
+      if !data.isNull
+      if filter.fold(true)(text => data.render(0).contains(text))
+    yield data
+  }
 
   def pretty(prefix: Seq[String] = Nil): Seq[String] = {
     val thisNode =

@@ -15,6 +15,34 @@ class PathTreeTest extends AnyWordSpec with Matchers {
     .updateData("grandparent".asPath, Map("grandparent-data" -> "hello").asUJson)
     .updateData("grandparent/parent".asPath, Map("parent-data" -> "world").asUJson)
 
+  "PathTree.query" should {
+    "return the results matching the given filter at the path" in {
+      val records @ List(a, b, c, d) = List(
+        Map("id" -> "a", "tag" -> "foo").asUJson,
+        Map("id" -> "b", "tag" -> "bar").asUJson,
+        Map("id" -> "c", "tag" -> "baz").asUJson,
+        Map("id" -> "d", "tag" -> "foo").asUJson
+      )
+      val differentPath = Map("id" -> "e", "tag" -> "foo, bar, baz").asUJson
+
+      val root = PathTree.empty
+        .updateData("db/anotherId/record1".asPath, differentPath)
+
+      val fullTree = records.zipWithIndex.foldLeft(root) { case (tree, (data, i)) =>
+        tree.updateData(s"db/someId/record$i".asPath, data)
+      }
+
+      fullTree
+        .query("db/someId".asPath, Option("foo")) should contain theSameElementsAs (List(a, d))
+      fullTree.query("db/someId".asPath, Option("bar")) should contain only (b)
+      fullTree.query("db/someId".asPath, Option("ba")) should contain only (b, c)
+
+      fullTree.query("db/anotherId".asPath, Option("foo")) should contain only (differentPath)
+      fullTree.query("db/anotherId".asPath, Option("nope")) shouldBe (empty)
+      fullTree.query("db/anotherId".asPath, None) should contain only (differentPath)
+    }
+  }
+
   "PathTree.formatted" should {
     "show a squashed view of the tree" in {
       deepTree.formatted shouldBe ("""grandparent = {"grandparent-data":"hello"}
