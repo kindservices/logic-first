@@ -1,8 +1,8 @@
 package kind.logic.json
 
+import kind.logic._
 import ujson.Value
-import kind.logic.*
-import upickle.default.*
+import upickle.default._
 
 /** This represents a basic file-system-like tree structure, where each node can have data
   *

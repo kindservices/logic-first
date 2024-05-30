@@ -1,6 +1,6 @@
 package kind.logic.db
 
-import zio.*
+import zio._
 
 /** Represents a database store
   */

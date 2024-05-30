@@ -1,7 +1,8 @@
 package kind.logic
 
 import kind.logic.telemetry.Telemetry
-import zio.{Task, *}
+import zio.Task
+import zio._
 
 /** A result is used as the return type (the result type) from a service function.
   *

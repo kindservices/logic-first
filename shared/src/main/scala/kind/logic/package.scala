@@ -1,9 +1,9 @@
 package kind
-import kind.logic.telemetry.*
+import kind.logic.json._
+import kind.logic.telemetry._
 import ujson.Value.Value
-import upickle.default.*
-import zio.*
-import kind.logic.json.*
+import upickle.default._
+import zio._
 
 import scala.util.Try
 package object logic {

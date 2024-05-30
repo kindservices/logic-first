@@ -100,6 +100,9 @@ case class TableComponent(source: DataSource, numRowsToShow: Int = 40) {
     }
   }
 
-  def refreshTable() = HtmlUtils.replace(container, makeTable)
+  def refreshTable() = {
+    container.innerHTML = ""
+    container.appendChild(makeTable)
+  }
 
 }

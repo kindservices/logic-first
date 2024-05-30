@@ -1,8 +1,8 @@
 package kind.logic.js.tables
 
-import zio.*
-import scalatags.JsDom.all.*
-import kind.logic.*
+import kind.logic._
+import scalatags.JsDom.all._
+import zio._
 
 /** A generic representation of the data behind a table.
   */

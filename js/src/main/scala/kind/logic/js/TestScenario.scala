@@ -1,10 +1,9 @@
 package kind.logic.js
 
-import scalatags.JsDom.all.*
-
-import upickle.default.{ReadWriter => RW}
-import upickle.default.*
+import scalatags.JsDom.all._
 import ujson.Value
+import upickle.default._
+import upickle.default.{ReadWriter => RW}
 
 /** Represents a named scenario
   *

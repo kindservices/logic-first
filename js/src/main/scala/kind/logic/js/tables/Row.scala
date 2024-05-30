@@ -1,7 +1,7 @@
 package kind.logic.js.tables
 
 import org.scalajs.dom.Node
-import scalatags.JsDom.all.*
+import scalatags.JsDom.all._
 
 final case class Row(cells: Seq[Node])
 object Row {
