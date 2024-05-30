@@ -13,10 +13,6 @@ import upickle.default.*
   */
 case class PathTree(children: Map[String, PathTree] = Map.empty, data: Json = ujson.Null)
     derives ReadWriter {
-  def add(child: String, data: Json = ujson.Null) = {
-    val newChild = PathTree(data = data)
-    copy(children = children + (child -> newChild))
-  }
 
   /** delete children beyond the given depth
     * @param depth
@@ -100,6 +96,28 @@ case class PathTree(children: Map[String, PathTree] = Map.empty, data: Json = uj
     thisNode ++ kids
   }
 
+  /** remove the child at the given path
+    * @param path
+    *   the path
+    * @return
+    *   a new tree if found, or None if not found
+    */
+  def remove(path: Seq[String]): Option[PathTree] = {
+    path match {
+      case Seq() => None
+      case Seq(id) =>
+        children.get(id).map(_ => copy(children = children - id))
+      case head +: theRest =>
+        children.get(head) match {
+          case Some(kid) =>
+            kid.remove(theRest).map { replaced =>
+              copy(children = children.updated(head, replaced))
+            }
+          case None => None
+        }
+    }
+  }
+
   def at(
       path: Seq[String]
   ): Option[PathTree] = {
@@ -117,9 +135,14 @@ case class PathTree(children: Map[String, PathTree] = Map.empty, data: Json = uj
     update(path, (t => t.copy(data = t.data.mergeWith(newData))), createIfNotFound)
   }
 
+  def add(
+      path: Seq[String],
+      newData: Json = ujson.Null
+  ) = updateData(path, newData, true)
+
   def updateData(
       path: Seq[String],
-      newData: Json,
+      newData: Json = ujson.Null,
       createIfNotFound: Boolean = true
   ) = update(path, (_.copy(data = newData)), createIfNotFound)
 

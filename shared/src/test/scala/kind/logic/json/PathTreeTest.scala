@@ -15,6 +15,30 @@ class PathTreeTest extends AnyWordSpec with Matchers {
     .updateData("grandparent".asPath, Map("grandparent-data" -> "hello").asUJson)
     .updateData("grandparent/parent".asPath, Map("parent-data" -> "world").asUJson)
 
+  "PathTree.remove" should {
+    "remove data at the given path" in {
+      val original =
+        PathTree
+          .forPath("a/b/c/d")
+          .add("a/b/c/e".asPath)
+          .add("a/b/c2".asPath)
+          .add("a2".asPath)
+
+      val Some(removed) = original.remove("a/b/c".asPath)
+      removed.collapse shouldBe """{
+                                  |  "a": {
+                                  |    "b": {
+                                  |      "c2": null
+                                  |    }
+                                  |  },
+                                  |  "a2": null
+                                  |}
+                                  |""".stripMargin.parseAsJson
+
+      original.remove("Dave".asPath) shouldBe None
+      original.remove("a/b/c/d/e/f".asPath) shouldBe None
+    }
+  }
   "PathTree.query" should {
     "return the results matching the given filter at the path" in {
       val records @ List(a, b, c, d) = List(
