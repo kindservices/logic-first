@@ -10,6 +10,12 @@ package object json {
   type JKey  = String | Int
   type JPath = Seq[JKey]
 
+  extension (path: String) {
+    def asPath: Seq[String] = path.split("/").toSeq.filterNot(_.isEmpty)
+
+    def parseAsJson: Json = ujson.read(path)
+  }
+
   def diffValues(a: ujson.Value, b: ujson.Value): ujson.Value = (a, b) match {
     case (ujson.Obj(aMap), ujson.Obj(bMap)) =>
       val keys = aMap.keySet ++ bMap.keySet
@@ -63,7 +69,8 @@ package object json {
       case (ujson.Arr(aArray), ujson.Arr(bArray)) =>
         ujson.Arr(aArray ++ bArray)
 
-      case (_, bValue) => bValue
+      case (aValue, ujson.Null) => aValue
+      case (_, bValue)          => bValue
     }
 
     def at(path: String, showError: Boolean = true): Option[Value] = {

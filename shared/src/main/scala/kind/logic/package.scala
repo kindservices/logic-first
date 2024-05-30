@@ -1,9 +1,14 @@
 package kind
-import kind.logic.telemetry._
-import zio._
+import kind.logic.telemetry.*
+import ujson.Value.Value
+import upickle.default.*
+import zio.*
+import kind.logic.json.*
+
 import scala.util.Try
 package object logic {
 
+  type Json             = Value
   opaque type Timestamp = Long
 
   extension (tsNanos: Long) {
@@ -22,8 +27,8 @@ package object logic {
     */
   extension [A](job: Task[A]) {
 
-    def asTry() : Try[A] = Try(execOrThrow())
-    
+    def asTry(): Try[A] = Try(execOrThrow())
+
     def execOrThrow(): A = Unsafe.unsafe { implicit unsafe =>
       Runtime.default.unsafe.run(job).getOrThrowFiberFailure()
     }
@@ -50,6 +55,32 @@ package object logic {
       call   <- telemetry.onCall(source, target, input)
       result <- call.completeWith(job)
     yield result
+  }
+
+  extension [A: ReadWriter](value: A) {
+    def asUJson = writeJs(value)
+
+    /** This is useful for combining different objects to compose in a json result.
+      *
+      * For example:
+      * {{{
+      *   val someData = serviceCall()
+      *   someData.withKey("data").merge
+      * }}}
+      * @param key
+      * @return
+      */
+    def withKey(key: String) = Map(key -> value)
+
+    /** Combines this object with another object as a json value
+      * @param other
+      *   the other object
+      * @tparam B
+      *   the other type
+      * @return
+      *   the merged json value
+      */
+    def merge[B: ReadWriter](other: B): Value = asUJson.mergeWith(other.asUJson)
   }
 
   // TODO: I tried using something like this to guard against people

@@ -1,5 +1,8 @@
 package kind.logic.json
-import upickle.default._
+
+import ujson.Value
+import kind.logic.*
+import upickle.default.*
 
 /** This represents a basic file-system-like tree structure, where each node can have data
   *
@@ -15,13 +18,64 @@ case class PathTree(children: Map[String, PathTree] = Map.empty, data: Json = uj
     copy(children = children + (child -> newChild))
   }
 
-  def asJson = writeJs(this)
+  /** delete children beyond the given depth
+    * @param depth
+    *   the depth to which we should prune the tree
+    * @return
+    *   a tree truncated to the given depth
+    */
+  def prune(depth: Int): PathTree = {
+    depth match {
+      case 0 => PathTree(data = data)
+      case n => copy(children = children.view.mapValues(_.prune(n - 1)).toMap)
+    }
+  }
 
-  def formatted = pretty().mkString("\n")
+  def isLeaf = children.isEmpty
+
+  /** @param depth
+    *   if negative, this will keep data at the leaf nodes. Otherwise only data at the given depth
+    *   will be retained
+    * @return
+    *   a new tree which only has data at the given depth
+    */
+  def withDataAtDepth(depth: Int): PathTree = {
+    def newChildren = children.view.mapValues(_.withDataAtDepth(depth - 1)).toMap
+    depth match {
+      case 0 => copy(children = newChildren, data = data)
+      case _ => copy(children = newChildren, data = ujson.Null)
+    }
+  }
+
+  /** Drops all data nodes except for the leaves
+    * @return
+    *   a new PathTree with data only at the leaves
+    */
+  def withDataAtLeaves: PathTree = {
+    if isLeaf then this
+    else {
+      copy(children = children.view.mapValues(_.withDataAtLeaves).toMap, data = ujson.Null)
+    }
+  }
+
+  /** @return
+    *   the full serialised representation of this tree, where the 'children' and 'data' elements
+    */
+  def asJson: Json = writeJs(this)
+
+  /** @return
+    *   a json representation with
+    */
+  def collapse: Json = children.foldLeft(data) { case (result, (key, child)) =>
+    child.collapse.withKey(key).asUJson.mergeWith(result)
+  }
+
+  def formatted: String = pretty().mkString("\n")
 
   def pretty(prefix: Seq[String] = Nil): Seq[String] = {
     val thisNode =
-      if children.isEmpty then Seq(prefix.mkString("", ".", s" = ${data.toString()}")) else Nil
+      if !data.isNull || isLeaf then Seq(prefix.mkString("", ".", s" = ${data.toString()}"))
+      else Nil
 
     val kids = children.flatMap { case (key, child) =>
       child.pretty(prefix :+ key)
@@ -70,17 +124,14 @@ case class PathTree(children: Map[String, PathTree] = Map.empty, data: Json = uj
     }
   }
 
-  def keys     = children.keySet
-  def keysList = keys.toSeq.sorted
+  def keys                    = children.keySet
+  def keysSorted: Seq[String] = keys.toSeq.sorted
 }
 
 object PathTree {
 
-  extension (path: String) {
-    def asPath = path.split("/").toSeq
-  }
-
   def apply(data: Json) = new PathTree(data = data)
 
+  def empty                 = forPath("")
   def forPath(path: String) = PathTree().updateData(path.asPath, ujson.Null, true)
 }

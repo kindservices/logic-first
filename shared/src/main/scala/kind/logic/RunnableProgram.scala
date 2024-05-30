@@ -59,6 +59,7 @@ abstract class RunnableProgram[F[_]](val logic: [A] => F[A] => Result[A])(using
     *   the Task result of this operation, with the side-effect of tracking the invocation
     */
   private def traceOnInput[A](operation: F[A]): Task[A] = {
-    onInput(operation).asTask(appCoords, operation)
+    val result = onInput(operation)
+    result.asTask(appCoords, operation)(using telemetry)
   }
 }
