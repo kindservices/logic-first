@@ -32,7 +32,37 @@ package object logic {
     def execOrThrow(): A = Unsafe.unsafe { implicit unsafe =>
       Runtime.default.unsafe.run(job).getOrThrowFiberFailure()
     }
+
+    /** This is handy when you just want to augment a Task which can update the Telemetry.
+      *
+      * It's a convenience method for just called 'traceTask', and useful when operating outside a
+      * RunnableProgram
+      *
+      * @param calledFrom
+      *   the source of the call
+      * @param target
+      *   the target of the call
+      * @param input
+      *   the input which triggered the task
+      * @param telemetry
+      *   the telemetry to update
+      * @return
+      *   a new Task which will update the Telemetry when run
+      */
+    def traceWith(calledFrom: Actor, target: Actor, input: Any = null)(using
+        telemetry: Telemetry
+    ): Task[A] = {
+      traceTask(job, calledFrom, target, Option(input).getOrElse(()))
+    }
+
+    /** @return
+      *   this task a 'Result' (something convenient for RunnablePrograms to run)
+      */
     def taskAsResult: Result[A] = Result.RunTask(job)
+
+    /** @return
+      *   this task a 'Result' (something convenient for RunnablePrograms to run)
+      */
     def taskAsResultTraced(targetSystem: Actor, input: Any = null): Result[A] =
       Result.TraceTask(targetSystem, job, Option(input))
   }
