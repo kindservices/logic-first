@@ -27,8 +27,8 @@ trait Telemetry(val callsStackRef: Ref[CallStack]) {
   /** @return
     *   a operation which will access the trace calls and render them as a mermaid block
     */
-  def asMermaidDiagram(mermaidStyle: String = DefaultMermaidStyle): UIO[String] =
-    asMermaidSequenceDiagram.map(sd => s"\n```mermaid\n$mermaidStyle\n${sd}```\n")
+  def asMermaidDiagram(mermaidStyle: String = DefaultMermaidStyle, maxLenComment : Int = 60, maxComment : Int = 30): UIO[String] =
+    asMermaidSequenceDiagram(maxLenComment, maxComment).map(sd => s"\n```mermaid\n$mermaidStyle\n${sd}```\n")
 
   /** This is just the sequence block part of the mermaid diagram. See 'asMermaidDiagram' for the
     * full markdown version
@@ -36,11 +36,11 @@ trait Telemetry(val callsStackRef: Ref[CallStack]) {
     * @return
     *   the calls as a mermaid sequence diagram
     */
-  def asMermaidSequenceDiagram: UIO[String] = calls.map { all =>
-    val statements = Telemetry.asMermaidStatements(all.sortBy(_.timestamp.asNanos))
+  def asMermaidSequenceDiagram(maxLenComment: Int, maxComment: Int): UIO[String] = calls.map { all =>
+    val statements = Telemetry.asMermaidStatements(all.sortBy(_.timestamp.asNanos), maxLenComment, maxComment)
 
-    // we want to group the participants together by category
-    // this
+    // Here we group the participants by category to produce (1) a sorted list of the categories and (2) the actors by category
+
     val participants = {
       val (orderedCategories, actorsByCategory) = all
         .sortBy(_.timestamp.asNanos)
@@ -74,7 +74,7 @@ trait Telemetry(val callsStackRef: Ref[CallStack]) {
 
           val participants = actorsByCategory
             .getOrElse(category, Nil)
-            .map(a => s"participant $a")
+            .map(a => s"participant ${a.qualified}")
           List(s"box $color $category") ++ participants ++ List("end")
         }
     }
@@ -124,8 +124,8 @@ object Telemetry {
     * @return
     *   a sequence of mermaid statements
     */
-  private def asMermaidStatements(sortedCalls: Seq[CompletedCall]): Seq[String] = {
-    SendMessage.fromCalls(sortedCalls).map(_.asMermaidString())
+  private def asMermaidStatements(sortedCalls: Seq[CompletedCall], maxLenComment: Int, maxComment: Int): Seq[String] = {
+    SendMessage.fromCalls(sortedCalls).map(_.asMermaidString(maxLenComment, maxComment))
   }
 }
 

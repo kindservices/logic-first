@@ -15,7 +15,8 @@ import scala.reflect.ClassTag
 case class Actor(`type`: ActorType, category: String, label: String) {
   def withName(newName: String)    = copy(label = newName)
   def withType(newType: ActorType) = copy(`type` = newType)
-  override def toString            = s"$category.$label ${`type`.icon}"
+  def qualified = s"$category.$label"
+  override def toString            = s"$qualified ${`type`.icon}"
 }
 object Actor:
   def person(category: String, label: String)     = Actor(ActorType.Person, category, label)
