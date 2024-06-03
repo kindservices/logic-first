@@ -11,7 +11,6 @@ package object logic {
   type Json             = Value
   opaque type Timestamp = Long
 
-
   extension (data: Json) {
     def as[A: ReadWriter]: Try[A] = Try(read[A](data))
   }

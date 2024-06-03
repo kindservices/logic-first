@@ -27,8 +27,14 @@ trait Telemetry(val callsStackRef: Ref[CallStack]) {
   /** @return
     *   a operation which will access the trace calls and render them as a mermaid block
     */
-  def asMermaidDiagram(mermaidStyle: String = DefaultMermaidStyle, maxLenComment : Int = 60, maxComment : Int = 30): UIO[String] =
-    asMermaidSequenceDiagram(maxLenComment, maxComment).map(sd => s"\n```mermaid\n$mermaidStyle\n${sd}```\n")
+  def asMermaidDiagram(
+      mermaidStyle: String = DefaultMermaidStyle,
+      maxLenComment: Int = 60,
+      maxComment: Int = 30
+  ): UIO[String] =
+    asMermaidSequenceDiagram(maxLenComment, maxComment).map(sd =>
+      s"\n```mermaid\n$mermaidStyle\n${sd}```\n"
+    )
 
   /** This is just the sequence block part of the mermaid diagram. See 'asMermaidDiagram' for the
     * full markdown version
@@ -36,50 +42,52 @@ trait Telemetry(val callsStackRef: Ref[CallStack]) {
     * @return
     *   the calls as a mermaid sequence diagram
     */
-  def asMermaidSequenceDiagram(maxLenComment: Int, maxComment: Int): UIO[String] = calls.map { all =>
-    val statements = Telemetry.asMermaidStatements(all.sortBy(_.timestamp.asNanos), maxLenComment, maxComment)
+  def asMermaidSequenceDiagram(maxLenComment: Int, maxComment: Int): UIO[String] = calls.map {
+    all =>
+      val statements =
+        Telemetry.asMermaidStatements(all.sortBy(_.timestamp.asNanos), maxLenComment, maxComment)
 
-    // Here we group the participants by category to produce (1) a sorted list of the categories and (2) the actors by category
+      // Here we group the participants by category to produce (1) a sorted list of the categories and (2) the actors by category
 
-    val participants = {
-      val (orderedCategories, actorsByCategory) = all
-        .sortBy(_.timestamp.asNanos)
-        .foldLeft((Seq[String](), Map[String, Seq[Actor]]())) {
-          case ((categories, coordsByCategory), call) =>
-            val newMap = coordsByCategory
-              .updatedWith(call.source.category) {
-                case None                                => Some(Seq(call.source))
-                case Some(v) if !v.contains(call.source) => Some(v :+ call.source)
-                case values                              => values
+      val participants = {
+        val (orderedCategories, actorsByCategory) = all
+          .sortBy(_.timestamp.asNanos)
+          .foldLeft((Seq[String](), Map[String, Seq[Actor]]())) {
+            case ((categories, coordsByCategory), call) =>
+              val newMap = coordsByCategory
+                .updatedWith(call.source.category) {
+                  case None                                => Some(Seq(call.source))
+                  case Some(v) if !v.contains(call.source) => Some(v :+ call.source)
+                  case values                              => values
+                }
+                .updatedWith(call.target.category) {
+                  case None                                => Some(Seq(call.target))
+                  case Some(v) if !v.contains(call.target) => Some(v :+ call.target)
+                  case values                              => values
+                }
+              val newCategories = {
+                val srcCat =
+                  if categories.contains(call.source.category) then categories
+                  else categories :+ call.source.category
+
+                if srcCat.contains(call.target.category) then srcCat
+                else srcCat :+ call.target.category
               }
-              .updatedWith(call.target.category) {
-                case None                                => Some(Seq(call.target))
-                case Some(v) if !v.contains(call.target) => Some(v :+ call.target)
-                case values                              => values
-              }
-            val newCategories = {
-              val srcCat =
-                if categories.contains(call.source.category) then categories
-                else categories :+ call.source.category
+              (newCategories, newMap)
+          }
 
-              if srcCat.contains(call.target.category) then srcCat
-              else srcCat :+ call.target.category
-            }
-            (newCategories, newMap)
-        }
+        orderedCategories
+          .zip(Colors.namedColors.take(orderedCategories.size))
+          .flatMap { (category, color) =>
 
-      orderedCategories
-        .zip(Colors.namedColors.take(orderedCategories.size))
-        .flatMap { (category, color) =>
+            val participants = actorsByCategory
+              .getOrElse(category, Nil)
+              .map(a => s"participant ${a.qualified}")
+            List(s"box $color $category") ++ participants ++ List("end")
+          }
+      }
 
-          val participants = actorsByCategory
-            .getOrElse(category, Nil)
-            .map(a => s"participant ${a.qualified}")
-          List(s"box $color $category") ++ participants ++ List("end")
-        }
-    }
-
-    (participants ++ statements).mkString("sequenceDiagram\n\t", "\n\t", "\n")
+      (participants ++ statements).mkString("sequenceDiagram\n\t", "\n\t", "\n")
   }
 
   def calls: UIO[Seq[CompletedCall]] = {
@@ -124,7 +132,11 @@ object Telemetry {
     * @return
     *   a sequence of mermaid statements
     */
-  private def asMermaidStatements(sortedCalls: Seq[CompletedCall], maxLenComment: Int, maxComment: Int): Seq[String] = {
+  private def asMermaidStatements(
+      sortedCalls: Seq[CompletedCall],
+      maxLenComment: Int,
+      maxComment: Int
+  ): Seq[String] = {
     SendMessage.fromCalls(sortedCalls).map(_.asMermaidString(maxLenComment, maxComment))
   }
 }

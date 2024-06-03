@@ -80,23 +80,7 @@ case class PathTree(children: Map[String, PathTree] = Map.empty, data: Json = uj
       node  <- at(path).toSeq
       child <- node.children.values
       data  <- Option(child.data)
-//      if !data.isNull
       if filter.test(data)
-    yield data
-  }
-
-  /**
-   * Applies a query for versioned documents
-   * @param path the path to query
-   * @return a list of results
-   */
-  def queryLatest(path: Seq[String], filter: Option[Filter] = None) = {
-    for
-      node  <- at(path).toSeq
-      child <- node.children.values
-      // // get the latest value for this node
-      latest = child.data
-      if filter.fold(true)(f => f.test(latest))
     yield data
   }
 

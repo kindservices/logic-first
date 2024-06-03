@@ -24,9 +24,9 @@ case class SendMessage(
     (timestamp.asNanos <= time.asNanos) && (time.asNanos <= endTimestamp.asNanos)
   }
 
-  private def chompQuotes(str : String) = str match {
+  private def chompQuotes(str: String) = str match {
     case other if other.startsWith("\"") && other.endsWith("\"") => other.init.tail
-    case other => other
+    case other                                                   => other
   }
 
   def messageFormatted = message match {
@@ -36,10 +36,10 @@ case class SendMessage(
         case Some(action) =>
           json.obj.remove("action")
           s"${chompQuotes(action.render(0))} ${json.render(0)}"
-        case None =>json.render(0)
+        case None => json.render(0)
       }
 
-    case other             => Option(other).map(_.toString).getOrElse("")
+    case other => Option(other).map(_.toString).getOrElse("")
   }
 
   private def truncate(owt: Any, len: Int = 85) =

@@ -13,7 +13,7 @@ package object json {
   extension (path: String) {
     def asPath: Seq[String] = path.split("/").toSeq.filterNot(_.isEmpty)
 
-    def parseAsJson: Json = ujson.read(path)
+    def parseAsJson: Json  = ujson.read(path)
     def asJsonString: Json = ujson.Str(path)
   }
 
