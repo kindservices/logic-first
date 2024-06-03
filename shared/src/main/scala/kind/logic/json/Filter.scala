@@ -15,6 +15,7 @@ enum Filter derives ReadWriter:
   case And(left : Filter, right : Filter)
   case Or(left : Filter, right : Filter)
 
+  def not = Not(this)
   def and (other : Filter) = And(this, other)
   def or (other : Filter) = Or(this, other)
 
