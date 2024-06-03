@@ -14,6 +14,7 @@ package object json {
     def asPath: Seq[String] = path.split("/").toSeq.filterNot(_.isEmpty)
 
     def parseAsJson: Json = ujson.read(path)
+    def asJsonString: Json = ujson.Str(path)
   }
 
   def diffValues(a: ujson.Value, b: ujson.Value): ujson.Value = (a, b) match {

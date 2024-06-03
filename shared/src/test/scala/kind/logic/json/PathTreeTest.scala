@@ -39,6 +39,12 @@ class PathTreeTest extends AnyWordSpec with Matchers {
       original.remove("a/b/c/d/e/f".asPath) shouldBe None
     }
   }
+  "PathTree.queryVersioned" should {
+
+    "return the latest results for a versioned collection" in {
+      ???
+    }
+  }
   "PathTree.query" should {
     "return the results matching the given filter at the path" in {
       val records @ List(a, b, c, d) = List(
@@ -57,13 +63,13 @@ class PathTreeTest extends AnyWordSpec with Matchers {
       }
 
       fullTree
-        .query("db/someId".asPath, Option("foo")) should contain theSameElementsAs (List(a, d))
-      fullTree.query("db/someId".asPath, Option("bar")) should contain only (b)
-      fullTree.query("db/someId".asPath, Option("ba")) should contain only (b, c)
+        .query("db/someId".asPath, Filter.Contains("tag", "foo")) should contain theSameElementsAs (List(a, d))
+      fullTree.query("db/someId".asPath, Filter.Contains("tag", "bar")) should contain only (b)
+      fullTree.query("db/someId".asPath, Filter.Contains("tag", "ba")) should contain only (b, c)
 
-      fullTree.query("db/anotherId".asPath, Option("foo")) should contain only (differentPath)
-      fullTree.query("db/anotherId".asPath, Option("nope")) shouldBe (empty)
-      fullTree.query("db/anotherId".asPath, None) should contain only (differentPath)
+      fullTree.query("db/anotherId".asPath, Filter.Contains("tag", "foo")) should contain only (differentPath)
+      fullTree.query("db/anotherId".asPath, Filter.Contains("tag", "nope")) shouldBe (empty)
+      fullTree.query("db/anotherId".asPath, Filter.Pass) should contain only (differentPath)
     }
   }
 
