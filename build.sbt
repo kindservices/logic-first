@@ -5,7 +5,7 @@ val githubUser = "kindservices"
 val githubRepo = "logic-first"
 
 ThisBuild / name := "logic-first"
-ThisBuild / organization := "com.github.aaronp"
+ThisBuild / organization := "kindservices"
 ThisBuild / scalaVersion := "3.4.1"
 ThisBuild / scalafmtOnCompile := true
 ThisBuild / versionScheme := Some("early-semver")
@@ -33,9 +33,9 @@ ThisBuild / version := {
     // this is my little hack. The run numbers always increase, an we want to reset them when
     // bump to the next version. To do that, we just subtract whatever the last build number was
     // before we incremented the minor version
-    runNumber - 46
+    runNumber - 53
   }
-  val baseVersion = s"0.5.$buildNr"
+  val baseVersion = s"0.6.$buildNr"
   if (sys.env.getOrElse("GITHUB_REF", "").contains("refs/heads/main"))
     baseVersion
   else
