@@ -8,7 +8,7 @@ private[telemetry] case class CallSite(
     operation: Any,
     timestamp: Timestamp
 ) {
-  def flip(newOperation : Any, newTimestamp : Timestamp): CallSite = {
+  def flip(newOperation: Any, newTimestamp: Timestamp): CallSite = {
     copy(source = target, target = source, operation = newOperation, timestamp = newTimestamp)
   }
 }

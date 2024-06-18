@@ -12,12 +12,14 @@ class TelemetryTest extends AnyWordSpec with Matchers {
 
   case class Data(name: String) derives ReadWriter
 
-  def someService(foo : String)(using t : Telemetry) : Task[String] = {
+  def someService(foo: String)(using t: Telemetry): Task[String] = {
     val from = Actor.service("test", "from")
-    val to = Actor.service("test", "to")
+    val to   = Actor.service("test", "to")
 
     val command = ujson.Str("someService").withKey("action").mergeWith(foo.withKey("foo"))
-    zio.ZIO.succeed(s"result of calling someService('${foo}')").traceWith(from, to, command)(using t)
+    zio.ZIO
+      .succeed(s"result of calling someService('${foo}')")
+      .traceWith(from, to, command)(using t)
   }
 
   "Telemetry.asMermaidDiagram" should {
@@ -27,7 +29,9 @@ class TelemetryTest extends AnyWordSpec with Matchers {
       val mermaid = t.asMermaid(maxLenComment = 500, maxComment = 500).execOrThrow()
 
       mermaid should include("test.from ->> test.to : someService {\"foo\": \"example\"}")
-      mermaid should include("test.to -->> test.from : {\"foo\": \"example\"} Returned 'result of calling someService('example')'")
+      mermaid should include(
+        "test.to -->> test.from : {\"foo\": \"example\"} Returned 'result of calling someService('example')'"
+      )
     }
     "be able to produce valid mermaid" in {
 

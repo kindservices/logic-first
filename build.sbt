@@ -87,7 +87,7 @@ lazy val app = crossProject(JSPlatform, JVMPlatform).in(file(".")).
     scalaJSLinkerConfig ~= {
       _.withModuleKind(ModuleKind.ESModule)
         .withModuleSplitStyle(
-          ModuleSplitStyle.SmallModulesFor(List()))
+          ModuleSplitStyle.SmallModulesFor(List("kind")))
     },
   )
 

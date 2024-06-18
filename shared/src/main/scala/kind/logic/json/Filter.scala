@@ -6,7 +6,7 @@ enum Filter derives ReadWriter:
   case Pass
   case Not(other: Filter)
   case Contains(field: String, contains: String) // this field contains the given string
-  case ContainsAny(contains: String) // this field contains the given string
+  case ContainsAny(contains: String)             // this field contains the given string
   case Eq(field: String, value: Json)
   case Match(value: Json)
   case LT(field: String, value: Double)
@@ -33,9 +33,9 @@ enum Filter derives ReadWriter:
     *   whether the filter applies
     */
   def test(data: Json): Boolean = this match {
-    case Pass            => true
-    case Not(filter)     => !filter.test(data)
-    case Match(expected) => data == expected
+    case Pass              => true
+    case Not(filter)       => !filter.test(data)
+    case Match(expected)   => data == expected
     case ContainsAny(text) => data.render(0).contains(text)
     case Contains(field, expected) =>
       data.objOpt.fold(false) { obj =>
