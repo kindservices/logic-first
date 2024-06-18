@@ -16,8 +16,10 @@ trait Telemetry(val callsStackRef: Ref[CallStack]) {
   val DefaultMermaidStyle = """%%{init: {"theme": "dark", 
 "themeVariables": {"primaryTextColor": "grey", "secondaryTextColor": "black", "fontFamily": "Arial", "fontSize": 14, "primaryColor": "#3498db"}}}%%"""
 
-  def asMermaid(mermaidStyle: String = DefaultMermaidStyle): UIO[String] =
-    asMermaidDiagram(mermaidStyle).map { mermaidMarkdown =>
+  def asMermaid(mermaidStyle: String = DefaultMermaidStyle,
+                maxLenComment: Int = 60,
+                maxComment: Int = 30): UIO[String] =
+    asMermaidDiagram(mermaidStyle, maxLenComment, maxComment).map { mermaidMarkdown =>
       mermaidMarkdown
         .replace("```mermaid", "")
         .replace("```", "")
@@ -137,7 +139,11 @@ object Telemetry {
       maxLenComment: Int,
       maxComment: Int
   ): Seq[String] = {
-    SendMessage.fromCalls(sortedCalls).map(_.asMermaidString(maxLenComment, maxComment))
+    // our completed calls are the inverse of the original calls -- the responses which come back from the invocations
+    val sortedCompleted = sortedCalls.flatMap(_.inverse).sortBy(_.timestamp.asNanos)
+    val calls: Seq[SendMessage] = SendMessage.fromCalls(sortedCalls, sortedCompleted)
+
+    calls.map(_.asMermaidString(maxLenComment, maxComment))
   }
 }
 

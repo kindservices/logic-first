@@ -103,7 +103,7 @@ object SendMessage {
     */
   def fromCalls(
       sortedCalls: Seq[CompletedCall],
-      sortedCompleted: Seq[CompletedCall] = Vector(),
+      sortedCompleted: Seq[CompletedCall],
       buffer: Seq[SendMessage] = Vector()
   ): Seq[SendMessage] = {
 

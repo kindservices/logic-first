@@ -6,6 +6,22 @@ import kind.logic.color.ConsoleColors._
 import concurrent.duration._
 final case class CompletedCall(invocation: CallSite, response: CallResponse) {
 
+  /**
+   * @return a call which represents the response from this call if this call has completed
+   */
+  def inverse: Option[CompletedCall] = {
+    response match {
+      case CallResponse.NotCompleted => None
+      case CallResponse.Error(ts, error) =>
+        // we're representing the response from a call, so the "Response" from the response is 'NotCompleted'
+        val inverse = copy(invocation = invocation.flip(error, ts), CallResponse.NotCompleted)
+        Option(inverse)
+      case CallResponse.Completed(ts, result) =>
+        val inverse = copy(invocation = invocation.flip(result, ts), CallResponse.NotCompleted)
+        Option(inverse)
+    }
+  }
+
   export invocation.*
   def atDateTime = java.time.Instant.ofEpochMilli(timestamp.asMillis)
 
