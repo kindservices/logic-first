@@ -13,6 +13,15 @@ import java.util.concurrent.TimeUnit
   */
 trait Telemetry(val callsStackRef: Ref[CallStack]) {
 
+  /**
+   * reset the callstack
+   * @param f a transformation function
+   * @return an action which updates the callstack
+   */
+  def reset(f :CallStack => CallStack = _ => CallStack()): UIO[Unit] = callsStackRef.update(f)
+
+  def size(): UIO[Int] = callsStackRef.get.map(_.calls.size)
+
   val DefaultMermaidStyle = """%%{init: {"theme": "dark", 
 "themeVariables": {"primaryTextColor": "grey", "secondaryTextColor": "black", "fontFamily": "Arial", "fontSize": 14, "primaryColor": "#3498db"}}}%%"""
 
@@ -47,51 +56,50 @@ trait Telemetry(val callsStackRef: Ref[CallStack]) {
     *   the calls as a mermaid sequence diagram
     */
   def asMermaidSequenceDiagram(maxLenComment: Int, maxComment: Int): UIO[String] = calls.map {
-    all =>
+    all  =>
       val statements =
         Telemetry.asMermaidStatements(all.sortBy(_.timestamp.asNanos), maxLenComment, maxComment)
 
       // Here we group the participants by category to produce (1) a sorted list of the categories and (2) the actors by category
+      (participants(all) ++ statements).mkString("sequenceDiagram\n\t", "\n\t", "\n")
+  }
 
-      val participants = {
-        val (orderedCategories, actorsByCategory) = all
-          .sortBy(_.timestamp.asNanos)
-          .foldLeft((Seq[String](), Map[String, Seq[Actor]]())) {
-            case ((categories, coordsByCategory), call) =>
-              val newMap = coordsByCategory
-                .updatedWith(call.source.category) {
-                  case None                                => Some(Seq(call.source))
-                  case Some(v) if !v.contains(call.source) => Some(v :+ call.source)
-                  case values                              => values
-                }
-                .updatedWith(call.target.category) {
-                  case None                                => Some(Seq(call.target))
-                  case Some(v) if !v.contains(call.target) => Some(v :+ call.target)
-                  case values                              => values
-                }
-              val newCategories = {
-                val srcCat =
-                  if categories.contains(call.source.category) then categories
-                  else categories :+ call.source.category
+  def participants(all : Seq[CompletedCall]): Seq[String] = {
+    val (orderedCategories, actorsByCategory) = all
+      .sortBy(_.timestamp.asNanos)
+      .foldLeft((Seq[String](), Map[String, Seq[Actor]]())) {
+        case ((categories, coordsByCategory), call) =>
+          val newMap = coordsByCategory
+            .updatedWith(call.source.category) {
+              case None                                => Some(Seq(call.source))
+              case Some(v) if !v.contains(call.source) => Some(v :+ call.source)
+              case values                              => values
+            }
+            .updatedWith(call.target.category) {
+              case None                                => Some(Seq(call.target))
+              case Some(v) if !v.contains(call.target) => Some(v :+ call.target)
+              case values                              => values
+            }
+          val newCategories = {
+            val srcCat =
+              if categories.contains(call.source.category) then categories
+              else categories :+ call.source.category
 
-                if srcCat.contains(call.target.category) then srcCat
-                else srcCat :+ call.target.category
-              }
-              (newCategories, newMap)
+            if srcCat.contains(call.target.category) then srcCat
+            else srcCat :+ call.target.category
           }
-
-        orderedCategories
-          .zip(Colors.namedColors.take(orderedCategories.size))
-          .flatMap { (category, color) =>
-
-            val participants = actorsByCategory
-              .getOrElse(category, Nil)
-              .map(a => s"participant ${a.qualified}")
-            List(s"box $color $category") ++ participants ++ List("end")
-          }
+          (newCategories, newMap)
       }
 
-      (participants ++ statements).mkString("sequenceDiagram\n\t", "\n\t", "\n")
+    orderedCategories
+      .zip(Colors.namedColors.take(orderedCategories.size))
+      .flatMap { (category, color) =>
+
+        val participants = actorsByCategory
+          .getOrElse(category, Nil)
+          .map(a => s"participant ${a.qualified}")
+        List(s"box $color $category") ++ participants ++ List("end")
+      }
   }
 
   def calls: UIO[Seq[CompletedCall]] = {
