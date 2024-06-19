@@ -1,9 +1,10 @@
 package kind.logic.json
 
 import kind.logic.*
-import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
+import scala.collection.immutable
 import scala.collection.immutable.Map
 
 class PathTreeTest extends AnyWordSpec with Matchers {
@@ -15,6 +16,23 @@ class PathTreeTest extends AnyWordSpec with Matchers {
     .updateData("grandparent".asPath, Map("grandparent-data" -> "hello").asUJson)
     .updateData("grandparent/parent".asPath, Map("parent-data" -> "world").asUJson)
 
+  "PathTree.latest" should {
+    "return the latest leaves under a grandparent node" in {
+
+      val original: PathTree = PathTree
+        .forPath("data/1/v0/fizz")
+        .add("data/1/v1/buzz".asPath)
+        .add("data/2/v0/alpha".asPath)
+        .add("data/2/v1/beta".asPath)
+        .add("data/2/v2/gamma".asPath)
+        .add("data/3/v0/dave".asPath)
+
+      val latest: immutable.Iterable[PathTree.Leaf] = original.latest("data".asPath)
+      latest.mkString("\n") shouldBe """data.1.v1.buzz = null
+                                       |data.2.v2.gamma = null
+                                       |data.3.v0.dave = null""".stripMargin
+    }
+  }
   "PathTree.remove" should {
     "remove data at the given path" in {
       val original =
