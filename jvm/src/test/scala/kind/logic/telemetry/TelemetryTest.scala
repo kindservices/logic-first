@@ -22,11 +22,11 @@ class TelemetryTest extends AnyWordSpec with Matchers {
       .traceWith(from, to, command)(using t)
   }
 
-  "Telemetry.asMermaidDiagram" should {
+  "Telemetry.mermaid.diagram" should {
     "work for a single call" in {
       val t = Telemetry()
       someService("example")(using t).execOrThrow()
-      val mermaid = t.asMermaid(maxLenComment = 500, maxComment = 500).execOrThrow()
+      val mermaid = t.mermaid.asMermaid(maxLenComment = 500, maxComment = 500).execOrThrow()
 
       mermaid should include("test.from ->> test.to : someService {\"foo\": \"example\"}")
       mermaid should include(
@@ -58,7 +58,7 @@ class TelemetryTest extends AnyWordSpec with Matchers {
 
       flow.asTry() // <--= run it
 
-      val mermaid = underTest.asMermaidDiagram(maxLenComment = 120).execOrThrow()
+      val mermaid = underTest.mermaid.diagram(maxLenComment = 120).execOrThrow()
 
       // you can test this output out at https://mermaid.live
       println("Test this at mermaid.live:")

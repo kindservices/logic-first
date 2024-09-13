@@ -45,7 +45,6 @@ case class PathTree(children: Map[String, PathTree] = Map.empty, data: Json = uj
     }
   }
 
-
   /** Drops all data nodes except for the leaves
     * @return
     *   a new PathTree with data only at the leaves
@@ -98,17 +97,17 @@ case class PathTree(children: Map[String, PathTree] = Map.empty, data: Json = uj
     thisNode ++ kids
   }
 
-
-  /**
-   * @param prefix the prefix path
-   * @return the leaves of the tree
-   */
+  /** @param prefix
+    *   the prefix path
+    * @return
+    *   the leaves of the tree
+    */
   def leaves(prefix: Seq[String] = Nil): Seq[PathTree.Leaf] = {
     if isLeaf then {
-     Seq(PathTree.Leaf(prefix, this))
+      Seq(PathTree.Leaf(prefix, this))
     } else {
-      children.flatMap {
-        case (id, kid) => kid.leaves(prefix :+ id)
+      children.flatMap { case (id, kid) =>
+        kid.leaves(prefix :+ id)
       }.toSeq
     }
   }
@@ -144,53 +143,43 @@ case class PathTree(children: Map[String, PathTree] = Map.empty, data: Json = uj
     }
   }
 
-  /**
-   * Consider the tree:
-   *
-   * /data/1/v0/fizz
-   * /data/1/v1/buzz
-   * /data/2/v0/alpha
-   * /data/2/v1/beta
-   * /data/2/v2/gamma
-   * /data/3/v0/dave
-   *
-   * for path /data, we want 'latest' to trim:
-   * /data/1/v1/buzz
-   * /data/2/v2/gamma
-   * /data/3/v0/dave
-   *
-   * @return the latest tree node leaves
-   */
-  def latest(path: Seq[String])(using ord : Ordering[String] = Ordering.String): immutable.Iterable[PathTree.Leaf] = {
+  /** Consider the tree:
+    *
+    * /data/1/v0/fizz /data/1/v1/buzz /data/2/v0/alpha /data/2/v1/beta /data/2/v2/gamma
+    * /data/3/v0/dave
+    *
+    * for path /data, we want 'latest' to trim: /data/1/v1/buzz /data/2/v2/gamma /data/3/v0/dave
+    *
+    * @return
+    *   the latest tree node leaves
+    */
+  def latest(
+      path: Seq[String]
+  )(using ord: Ordering[String] = Ordering.String): immutable.Iterable[PathTree.Leaf] = {
     latestNodes(path)(using ord).flatMap { leaf =>
       leaf.node.leaves(leaf.path)
     }
   }
 
-  /**
-   * Consider the tree:
-   *
-   * /data/1/v0/fizz
-   * /data/1/v1/buzz
-   * /data/2/v0/alpha
-   * /data/2/v1/beta
-   * /data/2/v2/gamma
-   * /data/3/v0/dave
-   *
-   * for path /data, we want 'latestNodes' will return
-   * /data/1/v1
-   * /data/2/v2
-   * /data/3/v0
-   *
-   * @return the latest version of the nodes one-level deep under the given path
-   */
-  def latestNodes(path: Seq[String])(using ord: Ordering[String] = Ordering.String): immutable.Iterable[PathTree.Leaf] = {
+  /** Consider the tree:
+    *
+    * /data/1/v0/fizz /data/1/v1/buzz /data/2/v0/alpha /data/2/v1/beta /data/2/v2/gamma
+    * /data/3/v0/dave
+    *
+    * for path /data, we want 'latestNodes' will return /data/1/v1 /data/2/v2 /data/3/v0
+    *
+    * @return
+    *   the latest version of the nodes one-level deep under the given path
+    */
+  def latestNodes(
+      path: Seq[String]
+  )(using ord: Ordering[String] = Ordering.String): immutable.Iterable[PathTree.Leaf] = {
     val child: PathTree = at(path).getOrElse(PathTree.empty)
     child.children.collect {
       case (id, versions) if versions.children.nonEmpty =>
         val sortedKids = versions.children.keySet.toList.sorted(using ord)
-        val lastKey = sortedKids.last
-        val data = versions.children(lastKey)
+        val lastKey    = sortedKids.last
+        val data       = versions.children(lastKey)
         PathTree.Leaf(path :+ id :+ lastKey, data)
     }
   }
@@ -238,15 +227,15 @@ case class PathTree(children: Map[String, PathTree] = Map.empty, data: Json = uj
 
 object PathTree {
 
-  extension (nodes : immutable.Iterable[Leaf]) {
-    def filter(filter : Filter): immutable.Iterable[Leaf] = {
+  extension (nodes: immutable.Iterable[Leaf]) {
+    def filter(filter: Filter): immutable.Iterable[Leaf] = {
       nodes.filter(n => filter.test(n.data))
     }
   }
 
-  case class Leaf(path : Seq[String], node : PathTree) {
-    def data = node.data
-    override def toString = pretty()
+  case class Leaf(path: Seq[String], node: PathTree) {
+    def data                      = node.data
+    override def toString         = pretty()
     def pretty(sep: String = ".") = path.mkString("", sep, s" = ${node.data.render(0)}")
   }
 

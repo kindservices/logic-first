@@ -21,7 +21,7 @@ def restaurantFlow = {
     // testData.result.ensuring(_ != null) // <-- we have to evaluate this / run
 
     restaurant.placeOrder(input).execOrThrow()
-    telemetry.asMermaidDiagram().execOrThrow()
+    telemetry.mermaid.diagram().execOrThrow()
   }
 
   Scenario("Restaurant", RestaurantTestData.order, asMermaid)
@@ -36,7 +36,7 @@ def marketFlow = {
     testData.underTest.placeOrder(input).execOrThrow()
     telemetry.calls.execOrThrow().foreach(println)
 
-    telemetry.asMermaidDiagram().execOrThrow()
+    telemetry.mermaid.diagram().execOrThrow()
   }
   Scenario("Marketplace", MarketplaceTestData.input, asMermaid)
 }
@@ -58,7 +58,7 @@ def endToEndFlow = {
           (key, value)
         }
 
-        val replacementOrder = Order(asBasket.toMap, Address("The", "Restaurant", "Address"))
+        val replacementOrder = Order(asBasket, Address("The", "Restaurant", "Address"))
         marketPlaceSetup.underTest
           .placeOrder(replacementOrder)
           .map { orderId =>
@@ -70,7 +70,7 @@ def endToEndFlow = {
 
     endToEnd.placeOrder(order).execOrThrow()
     telemetry.calls.execOrThrow().foreach(println)
-    telemetry.asMermaidDiagram().execOrThrow()
+    telemetry.mermaid.diagram().execOrThrow()
   }
 
   Scenario("End to End", RestaurantTestData.order, asMermaid)

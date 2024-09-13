@@ -19,7 +19,7 @@ class RestaurantTest extends AnyWordSpec with Matchers {
       calls.foreach(println)
 
       println("Mermaid:")
-      println(telemetry.asMermaidDiagram().execOrThrow())
+      println(telemetry.mermaid.diagram().execOrThrow())
 
       result shouldBe OrderId("order-2")
     }
