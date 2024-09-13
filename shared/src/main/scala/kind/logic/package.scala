@@ -104,7 +104,11 @@ package object logic {
       * @param key
       * @return
       */
-    def withKey(key: String) = Map(key -> value)
+    def withKey(key: String) : Map[String, A] = Map(key -> value)
+
+    def withInput[B : ReadWriter](input : B) = input.withKey("input").merge(value)
+
+    def asAction : Map[String, A] = withKey("action")
 
     /** Combines this object with another object as a json value
       * @param other
@@ -154,7 +158,7 @@ package object logic {
       * @return
       *   a task which will update the telemetry when run
       */
-    def asTaskTraced(source: Actor, target: Actor, input: Any)(using
+    def asTaskTraced(source: Actor, target: Actor, input: Any = null)(using
         telemetry: Telemetry
     ): Task[A] = traceTask(
       asTask,

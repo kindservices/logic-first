@@ -25,6 +25,7 @@ object Actor:
   def job(category: String, label: String)        = Actor(ActorType.Job, category, label)
   def email(category: String, label: String)      = Actor(ActorType.Email, category, label)
   def service(category: String, label: String)    = Actor(ActorType.Service, category, label)
+  def svc(using obj : sourcecode.Enclosing, pkg : sourcecode.Pkg) = Actor(ActorType.Service, pkg.value, obj.value)
   def fileSystem(category: String, label: String) = Actor(ActorType.FileSystem, category, label)
 
   def service[A: ClassTag]: Actor = forClass(summon[ClassTag[A]].runtimeClass).service
