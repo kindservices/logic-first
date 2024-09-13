@@ -6,8 +6,11 @@ target
 project/target
 /ui
 node_modules
-
 .bloop
 /project/project
 target
 .metals
+sequence.md
+workspace.json
+.structurizr
+workspace.dsl
