@@ -35,22 +35,25 @@ class App extends AnyWordSpec with Matchers {
 
       object Onboarding {
         // this name will be used as the 'component name'. The enclosing object 'assets' will be the 'software system'
-        val System   = Container.service
-        val Database = System.withType(ContainerType.Database)
+        given System: Container = Container.service
+        val Database            = System.withType(ContainerType.Database)
 
         def apply()(using t: Telemetry): Onboarding = new Onboarding {
           def create(spreadsheet: Spreadsheet): Task[ApplicationId] =
-            "id".asTask.traceWith(System, Database, spreadsheet)
+            "id".asTask.traceWith(Action.calls(Database), spreadsheet)
 
           def list(): Task[Map[ApplicationId, Spreadsheet]] =
-            Map("1" -> testSpreadsheet).asTask.traceWith(System, Database)
+            Map("1" -> testSpreadsheet).asTask.traceWith(Action.calls(Database))
 
           override def publish(id: ApplicationId): Task[AssetId] = {
-            val method = implicitly[sourcecode.Enclosing].value
-            val action = method.asAction.withInput(id)
+//            val method = implicitly[sourcecode.Enclosing].value
+//            val action = method.asAction.withInput(id)
             for
-              assetID <- "publish-id".asTask.traceWith(System, Dlt.System, action)
-              _       <- "db-id".asTask.traceWith(System, Database, assetID)
+              assetID <- "publish-id".asTask.traceWith(
+                Action.calls(Dlt.System, "publishToChain"),
+                id
+              )
+              _ <- "db-id".asTask.traceWith(Action.calls(Database, "writeToDatabase"), assetID)
             yield id
           }
         }

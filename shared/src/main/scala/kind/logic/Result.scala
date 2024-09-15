@@ -17,15 +17,16 @@ import zio._
   * @tparam A
   */
 enum Result[A]:
-  case RunTask(job: Task[A])                                                 extends Result[A]
-  case TraceTask(coords: Container, job: Task[A], input: Option[Any] = None) extends Result[A]
+  case RunTask(job: Task[A]) extends Result[A]
+  case TraceTask(coords: Container, job: Task[A], action: String, input: Option[Any] = None)
+      extends Result[A]
 
   /** @return
     *   the task for this result
     */
   def task: Task[A] = this match {
-    case RunTask(task)         => task
-    case TraceTask(_, task, _) => task
+    case RunTask(task)            => task
+    case TraceTask(_, task, _, _) => task
   }
 
   /** @param calledFrom
@@ -40,7 +41,7 @@ enum Result[A]:
   def asTask(calledFrom: Container, input: Any = null)(using telemetry: Telemetry): Task[A] =
     this match {
       case RunTask(task) => task
-      case TraceTask(targetCoords, job, inputOpt) =>
+      case TraceTask(targetCoords, job, action, inputOpt) =>
         val param = inputOpt.orElse(Option(input)).getOrElse("input not specified")
-        traceTask(job, calledFrom, targetCoords, param)
+        traceTask(job, Action(calledFrom, targetCoords, action), param)
     }

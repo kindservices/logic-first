@@ -11,6 +11,26 @@ package object logic {
   type Json             = Value
   opaque type Timestamp = Long
 
+  /** Trace this call to the given 'target' service / database / whatever
+    *
+    * @param source
+    *   where is this call coming from?
+    * @param target
+    *   what is the target of this call?
+    * @param input
+    *   the input used in this request
+    * @return
+    *   a new task which updates the telemetry with the call data when run
+    */
+  def traceTask[A](job: Task[A], action: Action, input: Any)(using
+      telemetry: Telemetry
+  ): Task[A] = {
+    for
+      call   <- telemetry.onCall(action, input)
+      result <- call.completeWith(job)
+    yield result
+  }
+
   extension (data: Json) {
     def as[A: ReadWriter]: Try[A] = Try(read[A](data))
   }
@@ -53,10 +73,10 @@ package object logic {
       * @return
       *   a new Task which will update the Telemetry when run
       */
-    def traceWith(calledFrom: Container, target: Container, input: Any = null)(using
+    def traceWith(action: Action, input: Any = null)(using
         telemetry: Telemetry
     ): Task[A] = {
-      traceTask(job, calledFrom, target, Option(input).getOrElse(()))
+      traceTask(job, action, Option(input).getOrElse(()))
     }
 
     /** @return
@@ -67,28 +87,8 @@ package object logic {
     /** @return
       *   this task a 'Result' (something convenient for RunnablePrograms to run)
       */
-    def taskAsResultTraced(targetSystem: Container, input: Any = null): Result[A] =
-      Result.TraceTask(targetSystem, job, Option(input))
-  }
-
-  /** Trace this call to the given 'target' service / database / whatever
-    *
-    * @param source
-    *   where is this call coming from?
-    * @param target
-    *   what is the target of this call?
-    * @param input
-    *   the input used in this request
-    * @return
-    *   a new task which updates the telemetry with the call data when run
-    */
-  def traceTask[A](job: Task[A], source: Container, target: Container, input: Any)(using
-      telemetry: Telemetry
-  ): Task[A] = {
-    for
-      call   <- telemetry.onCall(source, target, input)
-      result <- call.completeWith(job)
-    yield result
+    def taskAsResultTraced(targetSystem: Container, action: String, input: Any = null): Result[A] =
+      Result.TraceTask(targetSystem, job, action, Option(input))
   }
 
   extension [A: ReadWriter](value: A) {
@@ -139,33 +139,6 @@ package object logic {
           case result => result
         }
       }
-//
-//    /** This method is intended to be used when tasks are run within a single operation, for example
-//      * when we need to run things in parallel for a given input, so want to trace those resulting
-//      * actions.
-//      *
-//      * Everything else will be traced via the 'RunnableProgram' when we encounter an operation
-//      *
-//      * @param source
-//      *   the source system for this call (needed as we can run these tasks outside of
-//      *   RunnablePrograms)
-//      * @param target
-//      *   the target system - who we're calling
-//      * @param input
-//      *   the input used to make this call
-//      * @param telemetry
-//      *   the telemetry used to track calls
-//      * @return
-//      *   a task which will update the telemetry when run
-//      */
-//    def asTaskTraced(source: Container, target: Container, input: Any = null)(using
-//        telemetry: Telemetry
-//    ): Task[A] = traceTask(
-//      asTask,
-//      source,
-//      target,
-//      input
-//    )
 
     /** @return
       *   this operation as a task inside a 'Result' type. The call will NOT be traced
@@ -180,9 +153,8 @@ package object logic {
       *   this operation as a task inside a traced 'Result' type. The call to the target will be
       *   traced when run inside a RunnableProgram
       */
-    def asResultTraced(targetSystem: Container, input: Any = null): Result[A] =
-      Result.TraceTask(targetSystem, asTask, Option(input))
+    def asResultTraced(targetSystem: Container, action: String, input: Any = null): Result[A] =
+      Result.TraceTask(targetSystem, asTask, action, Option(input))
 
   }
-
 }

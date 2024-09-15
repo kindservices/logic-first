@@ -1,6 +1,7 @@
 package kind.logic
 
 import scala.reflect.ClassTag
+import upickle.default.*
 
 /** This is to represent the actors in a system. The people and things which send messsages and data
   * to each other
@@ -12,7 +13,8 @@ import scala.reflect.ClassTag
   * @param label
   *   what should we call this thing?
   */
-case class Container(`type`: ContainerType, softwareSystem: String, label: String) {
+case class Container(`type`: ContainerType, softwareSystem: String, label: String)
+    derives ReadWriter {
   def withName(newName: String)        = copy(label = newName)
   def withType(newType: ContainerType) = copy(`type` = newType)
   def qualified                        = s"$softwareSystem.$label"

@@ -32,9 +32,9 @@ trait Telemetry(val callsStackRef: Ref[CallStack]) {
     yield calls
   }
 
-  def onCall[F[_], A](source: Container, target: Container, input: Any): ZIO[Any, Nothing, Call] = {
+  def onCall[F[_], A](action: Action, input: Any): ZIO[Any, Nothing, Call] = {
     for
-      call <- Call(source, target, input)
+      call <- Call(action, input)
       _    <- callsStackRef.update(_.add(call))
     yield call
   }

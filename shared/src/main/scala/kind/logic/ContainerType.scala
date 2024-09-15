@@ -2,7 +2,9 @@ package kind.logic
 
 /** The type of 'actor' (or participant) in our system
   */
-enum ContainerType:
+import upickle.default.*
+
+enum ContainerType derives ReadWriter:
   case Person, Database, Queue, Email, Service, Job, FileSystem, Script, MobileApp, WebApp,
     DesktopApp, Function
 
