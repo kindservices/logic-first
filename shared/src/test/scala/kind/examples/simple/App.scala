@@ -101,6 +101,7 @@ class App extends AnyWordSpec with Matchers {
 
       val mermaid = testCase.execOrThrow()
       import eie.io.{given, *}
+      println(t.pretty)
       println("onboarding.md".asPath.text = mermaid)
 
     }

@@ -14,7 +14,8 @@ case class SendMessage(
     timestamp: kind.logic.Timestamp,
     duration: Duration,
     arrow: String, // the mermaid arrow. This is a bit hacky
-    message: Any,
+    operation: String,
+    input: Any,
     comment: String = ""
 ) {
   // def endTimestamp: kind.logic.Timestamp = timestamp.addDuration(duration)
@@ -29,7 +30,9 @@ case class SendMessage(
     case other                                                   => other
   }
 
-  def messageFormatted = message match {
+  def messageFormatted = s"$operation($inputFormatted)"
+
+  def inputFormatted = input match {
     case json: ujson.Value =>
       // we treat the 'action' key specially
       json.objOpt.flatMap(_.get("action")) match {
@@ -47,7 +50,10 @@ case class SendMessage(
     if opString.length > len then opString.take(len - 3) + "..." else opString
 
   def asMermaidString(maxLenComment: Int = 20, maxComment: Int = 30) = {
-    s"${from.qualified} $arrow ${to.qualified} : ${truncate(messageFormatted, maxLenComment)} ${truncate(comment, maxComment)}"
+    val msg =
+      if comment.nonEmpty then truncate(comment, maxComment)
+      else truncate(messageFormatted, maxLenComment)
+    s"${from.qualified} $arrow ${to.qualified} : $msg  THIS:${this}"
   }
 }
 
@@ -114,7 +120,8 @@ object SendMessage {
         call.timestamp,
         call.duration.getOrElse(Duration.Inf),
         "->>",
-        call.operation
+        call.operation,
+        call.input
       )
     }
 
@@ -126,20 +133,20 @@ object SendMessage {
         call.timestamp,
         call.duration.getOrElse(Duration.Inf),
         arrow,
-        call.operation
+        call.operation,
+        call.input
       )
     }
 
     def commentForResult(call: CompletedCall) = call.response match {
       case CallResponse.NotCompleted         => "never completed"
       case CallResponse.Error(_, error)      => s"Errored with '$error'"
-      case CallResponse.Completed(_, result) => s"Returned '$result'"
+      case CallResponse.Completed(_, result) => s"$result"
     }
 
     def endCall(call: CompletedCall, arrow: String): Option[SendMessage] = call.response match {
       case CallResponse.NotCompleted => None
-      case _                         =>
-        // Some(s"${call.target} $arrow ${call.source} : ${commentForResult(call)}")
+      case _ =>
         Option(
           SendMessage(
             call.target,

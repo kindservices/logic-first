@@ -25,6 +25,8 @@ trait Telemetry(val callsStackRef: Ref[CallStack]) {
 
   def mermaid = Mermaid(calls)
 
+  def pretty = calls.execOrThrow().mkString("\n")
+
   def calls: UIO[Seq[CompletedCall]] = {
     for
       callStack <- callsStackRef.get
