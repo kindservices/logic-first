@@ -96,15 +96,18 @@ class App extends AnyWordSpec with Matchers {
         applicationId <- onboarding.create(assets.testSpreadsheet)
         assetId       <- onboarding.publish(applicationId)
         diagram       <- t.mermaid.diagram()
-      yield diagram
+        c4       = t.c4.diagram
+      yield (diagram, c4)
 
-      val mermaid = testCase.execOrThrow()
+      val (mermaidDiagram, c4) = testCase.execOrThrow()
       import eie.io.{given, *}
       println(t.pretty)
       println("-" * 80)
       println(t.mermaid.callStack.execOrThrow().mkString("\n"))
       println("-" * 80)
-      println("onboarding.md".asPath.text = mermaid)
+      println("onboarding.md".asPath.text = mermaidDiagram)
+
+      println("workspace.dsl".asPath.text = c4)
     }
   }
 }

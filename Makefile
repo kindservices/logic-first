@@ -1,2 +1,2 @@
 structurizr:
-	docker run -it --rm -p 8080:8080 -v ${PWD}/target:/usr/local/structurizr structurizr/lite
+	docker run -it --rm -p 8091:8080 -v ${PWD}:/usr/local/structurizr structurizr/lite
