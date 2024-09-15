@@ -17,6 +17,7 @@ final case class CompletedCall(invocation: CallSite, response: CallResponse) {
         val inverse = copy(invocation = invocation.flip(error, ts), CallResponse.NotCompleted)
         Option(inverse)
       case CallResponse.Completed(ts, result) =>
+        // the inverse is 'not completed' because it's a reply
         val inverse = copy(invocation = invocation.flip(result, ts), CallResponse.NotCompleted)
         Option(inverse)
     }

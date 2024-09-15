@@ -2,6 +2,7 @@ package kind.examples.simple
 
 import kind.logic.telemetry.Telemetry
 import kind.logic.{*, given}
+import kind.logic.json.{*, given}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import zio.*
@@ -16,7 +17,7 @@ class App extends AnyWordSpec with Matchers {
       type ApplicationId = String
       type AssetId       = String
 
-      val testSpreadsheet = """{ "a" : "b" }""".asUJson
+      val testSpreadsheet = """{ "a" : "b" }""".parseAsJson
 
       case class Asset(name: String, data: Json)
 
@@ -36,7 +37,7 @@ class App extends AnyWordSpec with Matchers {
       object Onboarding {
         // this name will be used as the 'component name'. The enclosing object 'assets' will be the 'software system'
         given System: Container = Container.service
-        val Database            = System.withType(ContainerType.Database)
+        val Database            = Container.database.withName("DB")
 
         def apply()(using t: Telemetry): Onboarding = new Onboarding {
           def create(spreadsheet: Spreadsheet): Task[ApplicationId] =
@@ -46,8 +47,6 @@ class App extends AnyWordSpec with Matchers {
             Map("1" -> testSpreadsheet).asTask.traceWith(Action.calls(Database))
 
           override def publish(id: ApplicationId): Task[AssetId] = {
-//            val method = implicitly[sourcecode.Enclosing].value
-//            val action = method.asAction.withInput(id)
             for
               assetID <- "publish-id".asTask.traceWith(
                 Action.calls(Dlt.System, "publishToChain"),
@@ -102,8 +101,10 @@ class App extends AnyWordSpec with Matchers {
       val mermaid = testCase.execOrThrow()
       import eie.io.{given, *}
       println(t.pretty)
+      println("-" * 80)
+      println(t.mermaid.callStack.execOrThrow().mkString("\n"))
+      println("-" * 80)
       println("onboarding.md".asPath.text = mermaid)
-
     }
   }
 }

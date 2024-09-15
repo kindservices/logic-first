@@ -53,7 +53,7 @@ case class SendMessage(
     val msg =
       if comment.nonEmpty then truncate(comment, maxComment)
       else truncate(messageFormatted, maxLenComment)
-    s"${from.qualified} $arrow ${to.qualified} : $msg  THIS:${this}"
+    s"${from.qualified} $arrow ${to.qualified} : $msg "
   }
 }
 
@@ -155,6 +155,7 @@ object SendMessage {
             call.duration.getOrElse(Duration.Inf),
             arrow,
             call.operation,
+            call.input,
             commentForResult(call)
           )
         )

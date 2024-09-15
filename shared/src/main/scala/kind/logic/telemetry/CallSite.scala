@@ -10,7 +10,7 @@ private[telemetry] case class CallSite(
   export action.*
   def flip(newInput: Any, newTimestamp: Timestamp): CallSite = {
     copy(
-      action = action.flip(s"${action.operation} response"),
+      action = action.flip("response"),
       input = newInput,
       timestamp = newTimestamp
     )
