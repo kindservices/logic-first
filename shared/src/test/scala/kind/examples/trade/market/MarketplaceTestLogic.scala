@@ -12,9 +12,11 @@ object MarketplaceTestLogic extends MarketplaceTestLogic
 trait MarketplaceTestLogic {
 
   private val everythingIs100: Distributor = "everything's £100".asDistributor
-  private def everythingIs100Coords = Actor.person("distributor", everythingIs100.distributorName)
+  private def everythingIs100Coords =
+    Container.person("distributor", everythingIs100.distributorName)
   private val vowelsAreAFiver: Distributor = "vowels are £5".asDistributor
-  private def vowelsAreAFiverCoords = Actor.person("distributor", vowelsAreAFiver.distributorName)
+  private def vowelsAreAFiverCoords =
+    Container.person("distributor", vowelsAreAFiver.distributorName)
 
   extension (char: Char) {
     def isVowel: Boolean = "aeiou".contains(char.toLower)
@@ -34,14 +36,14 @@ trait MarketplaceTestLogic {
     prices
   }
 
-  def MarketDB = Marketplace.Symbol.withName("DB").withType(ActorType.Database)
+  def MarketDB = Marketplace.Symbol.withName("DB").withType(ContainerType.Database)
 
   def defaultLogic(using telemetry: Telemetry): [A] => MarketplaceLogic[A] => Result[A] =
     [A] => {
       (_: MarketplaceLogic[A]) match {
         case GetConfig =>
           Settings(2.seconds, Address("1", "2", "3")).asResultTraced(
-            Marketplace.Symbol.withName("Config").withType(ActorType.FileSystem),
+            Marketplace.Symbol.withName("Config").withType(ContainerType.FileSystem),
             GetConfig
           )
         case SaveOrder(order) =>
@@ -80,7 +82,7 @@ trait MarketplaceTestLogic {
               orderPortion
                 .asTaskTraced(
                   Marketplace.Symbol,
-                  Actor.person("distributor", distributor.distributorName),
+                  Container.person("distributor", distributor.distributorName),
                   input
                 )
                 .as(tuple) // <-- we trace this task, but ultimately return this from our function

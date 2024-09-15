@@ -9,8 +9,8 @@ import scala.concurrent.duration.*
 /** Representation of a message being sent from one actor to another
   */
 case class SendMessage(
-    from: Actor,
-    to: Actor,
+    from: Container,
+    to: Container,
     timestamp: kind.logic.Timestamp,
     duration: Duration,
     arrow: String, // the mermaid arrow. This is a bit hacky

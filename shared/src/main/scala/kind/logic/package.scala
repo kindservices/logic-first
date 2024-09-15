@@ -53,7 +53,7 @@ package object logic {
       * @return
       *   a new Task which will update the Telemetry when run
       */
-    def traceWith(calledFrom: Actor, target: Actor, input: Any = null)(using
+    def traceWith(calledFrom: Container, target: Container, input: Any = null)(using
         telemetry: Telemetry
     ): Task[A] = {
       traceTask(job, calledFrom, target, Option(input).getOrElse(()))
@@ -67,7 +67,7 @@ package object logic {
     /** @return
       *   this task a 'Result' (something convenient for RunnablePrograms to run)
       */
-    def taskAsResultTraced(targetSystem: Actor, input: Any = null): Result[A] =
+    def taskAsResultTraced(targetSystem: Container, input: Any = null): Result[A] =
       Result.TraceTask(targetSystem, job, Option(input))
   }
 
@@ -82,7 +82,7 @@ package object logic {
     * @return
     *   a new task which updates the telemetry with the call data when run
     */
-  def traceTask[A](job: Task[A], source: Actor, target: Actor, input: Any)(using
+  def traceTask[A](job: Task[A], source: Container, target: Container, input: Any)(using
       telemetry: Telemetry
   ): Task[A] = {
     for
@@ -104,11 +104,11 @@ package object logic {
       * @param key
       * @return
       */
-    def withKey(key: String) : Map[String, A] = Map(key -> value)
+    def withKey(key: String): Map[String, A] = Map(key -> value)
 
-    def withInput[B : ReadWriter](input : B) = input.withKey("input").merge(value)
+    def withInput[B: ReadWriter](input: B) = input.withKey("input").merge(value)
 
-    def asAction : Map[String, A] = withKey("action")
+    def asAction: Map[String, A] = withKey("action")
 
     /** Combines this object with another object as a json value
       * @param other
@@ -158,7 +158,7 @@ package object logic {
       * @return
       *   a task which will update the telemetry when run
       */
-    def asTaskTraced(source: Actor, target: Actor, input: Any = null)(using
+    def asTaskTraced(source: Container, target: Container, input: Any = null)(using
         telemetry: Telemetry
     ): Task[A] = traceTask(
       asTask,
@@ -180,7 +180,7 @@ package object logic {
       *   this operation as a task inside a traced 'Result' type. The call to the target will be
       *   traced when run inside a RunnableProgram
       */
-    def asResultTraced(targetSystem: Actor, input: Any = null): Result[A] =
+    def asResultTraced(targetSystem: Container, input: Any = null): Result[A] =
       Result.TraceTask(targetSystem, asTask, Option(input))
 
   }

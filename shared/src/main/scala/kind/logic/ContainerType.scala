@@ -2,8 +2,9 @@ package kind.logic
 
 /** The type of 'actor' (or participant) in our system
   */
-enum ActorType:
-  case Person, Database, Queue, Email, Service, Job, FileSystem
+enum ContainerType:
+  case Person, Database, Queue, Email, Service, Job, FileSystem, Script, MobileApp, WebApp,
+    DesktopApp, Function
 
   def icon = this match
     case Person     => "👤"
@@ -13,3 +14,8 @@ enum ActorType:
     case Service    => "🖥️"
     case Job        => "🤖"
     case FileSystem => "📁"
+    case Script     => "📜"
+    case MobileApp  => "📱"
+    case WebApp     => "🌐"
+    case DesktopApp => "🖥️"
+    case Function   => "λ"

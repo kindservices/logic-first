@@ -17,8 +17,8 @@ import zio._
   * @tparam A
   */
 enum Result[A]:
-  case RunTask(job: Task[A])                                             extends Result[A]
-  case TraceTask(coords: Actor, job: Task[A], input: Option[Any] = None) extends Result[A]
+  case RunTask(job: Task[A])                                                 extends Result[A]
+  case TraceTask(coords: Container, job: Task[A], input: Option[Any] = None) extends Result[A]
 
   /** @return
     *   the task for this result
@@ -37,7 +37,7 @@ enum Result[A]:
     * @return
     *   the Result as a Task
     */
-  def asTask(calledFrom: Actor, input: Any = null)(using telemetry: Telemetry): Task[A] =
+  def asTask(calledFrom: Container, input: Any = null)(using telemetry: Telemetry): Task[A] =
     this match {
       case RunTask(task) => task
       case TraceTask(targetCoords, job, inputOpt) =>

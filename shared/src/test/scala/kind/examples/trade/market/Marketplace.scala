@@ -12,7 +12,7 @@ trait Marketplace:
 object Marketplace {
   import MarketplaceLogic.*
 
-  val Symbol = Actor.service[Marketplace]
+  val Symbol = Container.service[Marketplace]
 
   class App(appLogic: [A] => MarketplaceLogic[A] => Result[A])(using telemetry: Telemetry)
       extends RunnableProgram[MarketplaceLogic](appLogic)

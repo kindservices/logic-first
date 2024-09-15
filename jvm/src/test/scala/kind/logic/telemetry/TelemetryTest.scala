@@ -13,8 +13,8 @@ class TelemetryTest extends AnyWordSpec with Matchers {
   case class Data(name: String) derives ReadWriter
 
   def someService(foo: String)(using t: Telemetry): Task[String] = {
-    val from = Actor.service("test", "from")
-    val to   = Actor.service("test", "to")
+    val from = Container.service("test", "from")
+    val to   = Container.service("test", "to")
 
     val command = ujson.Str("someService").withKey("action").mergeWith(foo.withKey("foo"))
     zio.ZIO
@@ -37,10 +37,10 @@ class TelemetryTest extends AnyWordSpec with Matchers {
 
       given underTest: Telemetry = Telemetry()
 
-      val BFF    = Actor.service("example", "BFF")
-      val Server = Actor.service("example", "App")
-      val DB     = Actor.database("managedsvc", "Mongo")
-      val Node   = Actor.service("example", "ViewServer")
+      val BFF    = Container.service("example", "BFF")
+      val Server = Container.service("example", "App")
+      val DB     = Container.database("managedsvc", "Mongo")
+      val Node   = Container.service("example", "ViewServer")
 
       val flow = for
         _ <- ZIO

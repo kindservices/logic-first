@@ -37,7 +37,7 @@ abstract class RunnableProgram[F[_]](val logic: [A] => F[A] => Result[A])(using
     *   the 'coords' (category and service name) of this application. Typically just return
     *   'Actor(this)' in sublasses
     */
-  protected def appCoords: Actor
+  protected def appCoords: Container
 
   /** How do we want to handle the execution of our program?
     *

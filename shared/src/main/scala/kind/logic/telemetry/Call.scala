@@ -51,7 +51,7 @@ private[telemetry] final class Call(
 }
 
 object Call {
-  def apply(source: Actor, target: Actor, operation: Any): ZIO[Any, Nothing, Call] = {
+  def apply(source: Container, target: Container, operation: Any): ZIO[Any, Nothing, Call] = {
     for
       time        <- now
       responseRef <- Ref.make[CallResponse](CallResponse.NotCompleted)

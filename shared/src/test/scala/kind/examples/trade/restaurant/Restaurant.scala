@@ -11,7 +11,7 @@ trait Restaurant {
 
 object Restaurant {
 
-  val Symbol = Actor.service[Restaurant]
+  val Symbol = Container.service[Restaurant]
 
   class App(appLogic: [A] => RestaurantLogic[A] => Result[A])(using telemetry: Telemetry)
       extends RunnableProgram[RestaurantLogic](appLogic)

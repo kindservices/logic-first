@@ -3,7 +3,7 @@ package kind.logic.telemetry
 import kind.logic._
 import kind.logic.color._
 import zio._
-import kind.logic.Actor
+import kind.logic.Container
 import kind.logic.color.Colors
 import zio.UIO
 
@@ -87,26 +87,26 @@ case class Mermaid(calls: UIO[Seq[CompletedCall]]) {
   def participants(all: Seq[CompletedCall]): Seq[String] = {
     val (orderedCategories, actorsByCategory) = all
       .sortBy(_.timestamp.asNanos)
-      .foldLeft((Seq[String](), Map[String, Seq[Actor]]())) {
+      .foldLeft((Seq[String](), Map[String, Seq[Container]]())) {
         case ((categories, coordsByCategory), call) =>
           val newMap = coordsByCategory
-            .updatedWith(call.source.category) {
+            .updatedWith(call.source.softwareSystem) {
               case None                                => Some(Seq(call.source))
               case Some(v) if !v.contains(call.source) => Some(v :+ call.source)
               case values                              => values
             }
-            .updatedWith(call.target.category) {
+            .updatedWith(call.target.softwareSystem) {
               case None                                => Some(Seq(call.target))
               case Some(v) if !v.contains(call.target) => Some(v :+ call.target)
               case values                              => values
             }
           val newCategories = {
             val srcCat =
-              if categories.contains(call.source.category) then categories
-              else categories :+ call.source.category
+              if categories.contains(call.source.softwareSystem) then categories
+              else categories :+ call.source.softwareSystem
 
-            if srcCat.contains(call.target.category) then srcCat
-            else srcCat :+ call.target.category
+            if srcCat.contains(call.target.softwareSystem) then srcCat
+            else srcCat :+ call.target.softwareSystem
           }
           (newCategories, newMap)
       }
