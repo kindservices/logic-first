@@ -65,7 +65,6 @@ object Container:
   def service(using obj: sourcecode.Enclosing) = of(ContainerType.Service)
   def serviceForClass[A: ClassTag]: Container  = forClass(summon[ClassTag[A]].runtimeClass).service
 
-
   def of(typ: ContainerType)(using obj: sourcecode.Enclosing) = {
     // to get a C4 diagram, we'll need to extract (1) the 'Software System' and (2) the container (app, data store, etc)
     val (system, name) = systemAndContainer

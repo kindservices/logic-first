@@ -40,17 +40,17 @@ class App extends AnyWordSpec with Matchers {
 
         def apply()(using t: Telemetry): Onboarding = new Onboarding {
           def create(spreadsheet: Spreadsheet): Task[ApplicationId] =
-            "id".asTaskTraced(System, Database, spreadsheet)
+            "id".asTask.traceWith(System, Database, spreadsheet)
 
           def list(): Task[Map[ApplicationId, Spreadsheet]] =
-            Map("1" -> testSpreadsheet).asTaskTraced(System, Database)
+            Map("1" -> testSpreadsheet).asTask.traceWith(System, Database)
 
           override def publish(id: ApplicationId): Task[AssetId] = {
             val method = implicitly[sourcecode.Enclosing].value
             val action = method.asAction.withInput(id)
             for
-              assetID <- "publish-id".asTaskTraced(System, Dlt.System, action)
-              _       <- "db-id".asTaskTraced(System, Database, assetID)
+              assetID <- "publish-id".asTask.traceWith(System, Dlt.System, action)
+              _       <- "db-id".asTask.traceWith(System, Database, assetID)
             yield id
           }
         }

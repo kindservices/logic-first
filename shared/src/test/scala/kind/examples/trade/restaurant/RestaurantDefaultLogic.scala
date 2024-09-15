@@ -22,9 +22,9 @@ trait RestaurantDefaultLogic {
         Console.println(message).asResult
       case RestaurantLogic.NoOp => Console.println("no-op").asResult
       case RestaurantLogic.GetStrategy =>
-        Strategy(30, 7).asResultTraced(Container.service[Restaurant])
+        Strategy(30, 7).asResultTraced(Container.serviceForClass[Restaurant])
       case RestaurantLogic.SaveOrder(order) =>
-        OrderId(s"order-${order.dishes.size}").asResultTraced(Container.service[Restaurant])
+        OrderId(s"order-${order.dishes.size}").asResultTraced(Container.serviceForClass[Restaurant])
     }
   }
 }

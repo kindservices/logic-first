@@ -139,33 +139,33 @@ package object logic {
           case result => result
         }
       }
-
-    /** This method is intended to be used when tasks are run within a single operation, for example
-      * when we need to run things in parallel for a given input, so want to trace those resulting
-      * actions.
-      *
-      * Everything else will be traced via the 'RunnableProgram' when we encounter an operation
-      *
-      * @param source
-      *   the source system for this call (needed as we can run these tasks outside of
-      *   RunnablePrograms)
-      * @param target
-      *   the target system - who we're calling
-      * @param input
-      *   the input used to make this call
-      * @param telemetry
-      *   the telemetry used to track calls
-      * @return
-      *   a task which will update the telemetry when run
-      */
-    def asTaskTraced(source: Container, target: Container, input: Any = null)(using
-        telemetry: Telemetry
-    ): Task[A] = traceTask(
-      asTask,
-      source,
-      target,
-      input
-    )
+//
+//    /** This method is intended to be used when tasks are run within a single operation, for example
+//      * when we need to run things in parallel for a given input, so want to trace those resulting
+//      * actions.
+//      *
+//      * Everything else will be traced via the 'RunnableProgram' when we encounter an operation
+//      *
+//      * @param source
+//      *   the source system for this call (needed as we can run these tasks outside of
+//      *   RunnablePrograms)
+//      * @param target
+//      *   the target system - who we're calling
+//      * @param input
+//      *   the input used to make this call
+//      * @param telemetry
+//      *   the telemetry used to track calls
+//      * @return
+//      *   a task which will update the telemetry when run
+//      */
+//    def asTaskTraced(source: Container, target: Container, input: Any = null)(using
+//        telemetry: Telemetry
+//    ): Task[A] = traceTask(
+//      asTask,
+//      source,
+//      target,
+//      input
+//    )
 
     /** @return
       *   this operation as a task inside a 'Result' type. The call will NOT be traced

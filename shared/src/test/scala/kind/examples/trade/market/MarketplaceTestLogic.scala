@@ -57,14 +57,14 @@ trait MarketplaceTestLogic {
           ZIO
             .foreachPar(Seq(vowelsAreAFiver, everythingIs100)) {
               case distributor @ `vowelsAreAFiver` =>
-                RFQResponse(distributor, quoteVowels(order)).asTaskTraced(
+                RFQResponse(distributor, quoteVowels(order)).asTask.traceWith(
                   Marketplace.Symbol,
                   vowelsAreAFiverCoords,
                   order
                 )
 
               case distributor @ `everythingIs100` =>
-                RFQResponse(distributor, everythings100(order)).asTaskTraced(
+                RFQResponse(distributor, everythings100(order)).asTask.traceWith(
                   Marketplace.Symbol,
                   everythingIs100Coords,
                   order
@@ -79,8 +79,8 @@ trait MarketplaceTestLogic {
 
               // again, here we explicitly trace the calls we make, as they are internal to the ultimate 'Task' we return
               // that is to say, there is a granularity here we don't want to lose
-              orderPortion
-                .asTaskTraced(
+              orderPortion.asTask
+                .traceWith(
                   Marketplace.Symbol,
                   Container.person("distributor", distributor.distributorName),
                   input
