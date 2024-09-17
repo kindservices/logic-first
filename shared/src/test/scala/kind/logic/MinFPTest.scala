@@ -8,7 +8,7 @@ class MinFPTest extends AnyWordSpec with Matchers {
 
   "extension asResultTraced" should {
     "work for operations which throw an exception" in {
-      val resultTraced = sys.error("Bang").asResultTraced(Actor.person("some", "test"))
+      val resultTraced = sys.error("Bang").asResultTraced(Container.person("some", "test"), "test")
 
       val Left(result) = resultTraced.task.either.execOrThrow(): @unchecked
       result.getMessage shouldBe "Bang"
@@ -16,7 +16,7 @@ class MinFPTest extends AnyWordSpec with Matchers {
     "error when we try to us it for ZIO types" in {
       val Left(result) = ZIO
         .attempt(1)
-        .asResultTraced(Actor.person("some", "test"))
+        .asResultTraced(Container.person("some", "test"), "test")
         .task
         .either
         .execOrThrow(): @unchecked

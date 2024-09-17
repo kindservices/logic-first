@@ -4,7 +4,14 @@ import eie.io.{_, given}
 
 import scala.language.implicitConversions
 
-case class Scenario[A](title: String, input: A, genMermaid: A => String, subDir: String = "", preText : String = "", postText : String = "") {
+case class Scenario[A](
+    title: String,
+    input: A,
+    genMermaid: A => String,
+    subDir: String = "",
+    preText: String = "",
+    postText: String = ""
+) {
 
   def fileName = title.filter(_.isLetterOrDigit)
   def path = {

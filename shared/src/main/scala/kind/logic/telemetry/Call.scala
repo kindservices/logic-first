@@ -16,8 +16,8 @@ private[telemetry] final class Call(
     response: Ref[CallResponse]
 ) {
 
-  export invocation.source
-  export invocation.target
+  export invocation.action.source
+  export invocation.action.target
 
   override def toString = invocation.toString
 
@@ -51,10 +51,10 @@ private[telemetry] final class Call(
 }
 
 object Call {
-  def apply(source: Actor, target: Actor, operation: Any): ZIO[Any, Nothing, Call] = {
+  def apply(action: Action, operation: Any): ZIO[Any, Nothing, Call] = {
     for
       time        <- now
       responseRef <- Ref.make[CallResponse](CallResponse.NotCompleted)
-    yield new Call(CallSite(source, target, operation, time.asTimestampNanos), responseRef)
+    yield new Call(CallSite(action, operation, time.asTimestampNanos), responseRef)
   }
 }

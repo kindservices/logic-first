@@ -13,6 +13,13 @@ package object json {
   extension (path: String) {
     def asPath: Seq[String] = path.split("/").toSeq.filterNot(_.isEmpty)
 
+    def asIdentifier = {
+      val id = path.filter(_.isLetterOrDigit)
+      if id.isEmpty then ""
+      else {
+        s"${id.head.toLower}${id.tail}"
+      }
+    }
     def parseAsJson: Json  = ujson.read(path)
     def asJsonString: Json = ujson.Str(path)
   }
