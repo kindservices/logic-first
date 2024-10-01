@@ -239,13 +239,12 @@ case class C4(calls: Seq[CompletedCall], layoutByName: Map[String, String] = Map
 
   private def interactions = {
     val operations = calls.groupBy(c => (c.source, c.target)).map { case ((from, to), srcToCalls) =>
-      val operations = srcToCalls match {
+      val operations = srcToCalls.distinct match {
         case Seq(only) => only.operation
         case many =>
           val ops = many.map(_.operation)
           ops.init.mkString("", ", ", s" and ${many.last.operation}")
       }
-//        s"""        ${from.softwareSystem.asSystem}.${from.label.asContainer} -> ${to.softwareSystem.asSystem}.${to.label.asContainer} -> "${operations}" """
       s"""        ${from.label.asContainer} -> ${to.label.asContainer} "${operations}" """
     }
 
