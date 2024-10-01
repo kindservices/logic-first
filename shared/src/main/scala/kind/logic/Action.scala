@@ -52,8 +52,12 @@ object Action {
     // the enclosing is something like:
     // kind.examples.simple.App#nested.assets.Onboarding.apply $anon#create
     val parts = src.value.split("#").toSeq
-    if parts.length < 2 then sys.error(s"BUG: don't use 'Action.calls' for ${src.value}")
-    parts.last
+    if parts.length < 2 then {
+      val pathParts = src.value.split("\\.").toSeq
+      if pathParts.length < 2 then {
+        sys.error(s"We couldn't derive the operation from ${src.value} split on '#' or '.'. As a fix, just don't use 'Action.calls' for ${src.value}")
+      } else pathParts.last
+    } else
+      parts.last
   }
-
 }
