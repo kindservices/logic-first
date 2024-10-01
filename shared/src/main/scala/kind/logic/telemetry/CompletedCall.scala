@@ -32,12 +32,12 @@ final case class CompletedCall(invocation: CallSite, response: CallResponse) {
   override def toString = toStringColor
 
   def toStringMonocolor =
-    s"$source --[ $operation ]--> $target $resultText and took ${duration.map(_.toString).getOrElse("N/A")} at $atDateTime"
+    s"$source --[ $operation ]--> $target $resultText and took ${duration.map(_.toString).getOrElse("N/A")} at $atDateTime (${timestamp.asNanos})"
 
   def operationArrow = s"--[ $operation ]-->"
 
   def toStringColor =
     s"${blue(source.toString)} ${purple(operationArrow)} ${yellow(
         target.toString
-      )} $resultText and took ${duration.map(_.toString).getOrElse("N/A")} at $atDateTime"
+      )} $resultText and took ${duration.map(_.toString).getOrElse("N/A")} at $atDateTime (${timestamp.asNanos})"
 }
