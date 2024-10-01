@@ -12,12 +12,18 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Set up JDK 11
+    - name: Set up JDK
       uses: actions/setup-java@v2
       with:
-        java-version: '11'
+        java-version: '20'
         distribution: 'adopt'
-
+    - name: Install SBT
+      run: |
+        echo "Installing SBT..."
+        curl -Lo sbt.deb https://repo.scala-sbt.org/scalasbt/debian/sbt-1.5.5.deb
+        sudo dpkg -i sbt.deb
+        sudo apt-get update
+        sudo apt-get install sbt
     - name: Cache SBT
       uses: actions/cache@v2
       with:
