@@ -32,10 +32,13 @@ ThisBuild / version := {
     val runNumber = sys.env.getOrElse("GITHUB_RUN_NUMBER", "0").toInt
     // this is my little hack. The run numbers always increase, an we want to reset them when
     // bump to the next version. To do that, we just subtract whatever the last build number was
-    // before we incremented the minor version
-    runNumber - 53
+    // before we incremented the minor version.
+    //
+    // to update, just check the Github build output and add whatever the build number is to this
+    // constant, then update the minor number
+    runNumber - 66
   }
-  val baseVersion = s"0.6.$buildNr"
+  val baseVersion = s"0.7.$buildNr"
   if (sys.env.getOrElse("GITHUB_REF", "").contains("refs/heads/main"))
     baseVersion
   else
