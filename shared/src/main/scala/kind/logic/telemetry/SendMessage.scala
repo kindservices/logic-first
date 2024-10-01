@@ -9,6 +9,7 @@ import scala.concurrent.duration.*
 /** Representation of a message being sent from one actor to another
   */
 case class SendMessage(
+    callId : Long,
     from: Container,
     to: Container,
     timestamp: kind.logic.Timestamp,
@@ -18,7 +19,19 @@ case class SendMessage(
     input: Any,
     comment: String = ""
 ) {
-  // def endTimestamp: kind.logic.Timestamp = timestamp.addDuration(duration)
+
+  def atDateTime = java.time.Instant.ofEpochMilli(timestamp.asMillis)
+
+  def asMermaidString(maxLenComment: Int = 20, maxComment: Int = 30) = {
+    val msg =
+      if comment.nonEmpty then truncate(comment, maxComment)
+      else truncate(messageFormatted, maxLenComment)
+    s"${from.qualified} $arrow ${to.qualified} : $msg "
+  }
+
+  def pretty =
+    s"${timestamp.asNanos}@${callId}: $from:$operation $arrow $to w/ $input took ${duration} at ${atDateTime}"
+
   def endTimestamp: kind.logic.Timestamp = (timestamp.asNanos + duration.toNanos).asTimestampNanos
 
   def isActiveAt(time: Timestamp) = {
@@ -49,12 +62,6 @@ case class SendMessage(
     val opString = owt.toString.linesIterator.mkString("") // remove newlines
     if opString.length > len then opString.take(len - 3) + "..." else opString
 
-  def asMermaidString(maxLenComment: Int = 20, maxComment: Int = 30) = {
-    val msg =
-      if comment.nonEmpty then truncate(comment, maxComment)
-      else truncate(messageFormatted, maxLenComment)
-    s"${from.qualified} $arrow ${to.qualified} : $msg "
-  }
 }
 
 object SendMessage {
@@ -89,32 +96,38 @@ object SendMessage {
 
   private def commentForResult(call: CompletedCall) = call.response match {
     case CallResponse.NotCompleted         => "never completed"
-    case CallResponse.Error(_, error)      => s"Errored with '$error'"
-    case CallResponse.Completed(_, result) => s"$result"
+    case CallResponse.Error(_, _, error)      => s"Failed with '$error'"
+    case CallResponse.Completed(_, _, result) => s"$result"
   }
   private enum Msg:
-    case Start(id: Int, call: CompletedCall)
-    case End(startId: Int, endTimestamp: Timestamp, call: CompletedCall)
+    case Start(call: CompletedCall)
+    case End(endTimestamp: Timestamp, call: CompletedCall)
+    def callId = this match {
+      case Start(call) => call.callId
+      case End(_, call) => call.responseId.getOrElse(Long.MaxValue)
+    }
     def timestamp: Timestamp = this match {
-      case Start(_, call)          => call.timestamp
-      case End(_, endTimestamp, _) => endTimestamp
+      case Start(call)          => call.timestamp
+      case End(endTimestamp, _) => endTimestamp
     }
 
-  def from(calls: Seq[CompletedCall]): Seq[SendMessage] = {
+  private[telemetry] def from(calls: Seq[CompletedCall]): Seq[SendMessage] = {
+
     val messages: IndexedSeq[Msg] = {
-      val startMessages: Seq[Msg.Start] = calls.zipWithIndex.map { case (c, i) =>
-        Msg.Start(i, c)
-      }
+      val startMessages: Seq[Msg.Start] = calls.map { c => Msg.Start(c) }
       val endMessages = startMessages.flatMap { msg =>
         msg.call.endTimestamp.map { endTimestamp =>
-          Msg.End(msg.id, endTimestamp, msg.call)
+          Msg.End(endTimestamp, msg.call)
         }
       }
-      (startMessages ++ endMessages).toIndexedSeq.sortBy(_.timestamp.asNanos)
+      (startMessages ++ endMessages).toIndexedSeq.sortBy {
+        case Msg.Start(call)          => call.callId
+        case Msg.End(_, call) => call.responseId.getOrElse(Long.MaxValue)
+      }
     }
 
     messages.zipWithIndex.map {
-      case (Msg.Start(msgId, call), i) =>
+      case (Msg.Start(call), i) =>
         val arrow =
           if call.source == call.target then "->>"
           else {
@@ -122,13 +135,14 @@ object SendMessage {
             // then we represent that as an async arrow: "->>+"
             val opt = messages.lift.apply(i + 1)
             val isSynchronous = opt.exists {
-              case Msg.End(sourceId, _, _) => sourceId == msgId
+              case Msg.End(_, endCall) => call.target == endCall.source && endCall.target == call.source
               case _                       => false
             }
 
             if isSynchronous then "->>" else "->>+"
           }
         SendMessage(
+          call.callId,
           call.source,
           call.target,
           call.timestamp,
@@ -137,20 +151,21 @@ object SendMessage {
           call.operation,
           call.input
         )
-      case (Msg.End(startId, timestamp, call), i) =>
+      case (Msg.End(timestamp, call), i) =>
         // if the previous call was the start of this call, then its synchronous. Otherwise not
         val arrow = {
           val isSynchronous = messages.lift.apply(i - 1).exists {
-            case Msg.Start(id, _) => id == startId
+            case Msg.Start(srcCall) => srcCall.target == call.source && call.target == srcCall.source
             case _                => false
           }
           if isSynchronous then "-->>" else "-->>-"
         }
 
         SendMessage(
+          call.responseId.getOrElse(Long.MaxValue),
           call.target,
           call.source,
-          call.timestamp,
+          timestamp,
           call.duration.getOrElse(Duration.Inf),
           arrow,
           call.operation,

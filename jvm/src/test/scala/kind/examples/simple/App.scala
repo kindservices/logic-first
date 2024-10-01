@@ -48,8 +48,8 @@ class App extends AnyWordSpec with Matchers {
     def apply()(using telemetry: Telemetry): Search = new Search {
       override def query(term: String): Task[Seq[Search.Result]] = {
         val parts = term.split(" ").toSeq
-        for result <- ZIO.foreach(parts) { word =>
-            Map(word -> word.size).asTask.traceWith(Action.calls(Database), word)
+        for result <- ZIO.foreachPar(parts) { word =>
+            Map(word -> word.length).asTask.traceWith(Action.calls(Database), word)
           }
         yield result
       }
@@ -63,16 +63,11 @@ class App extends AnyWordSpec with Matchers {
       // here is a basic, typical flow where somebody saves some data and then does a query
       val data = "some input"
       val testCase = for
-        userSave      <- data.asTask.traceWith(Action(Admin, UI, "save form"), data).fork
-        applicationId <- BFF.save(data).traceWith(Action(UI, BFF.System, "onSave"), data)
-        _             <- userSave.join
+        _      <- (data.asTask *> BFF.save(data).traceWith(Action(UI, BFF.System, "onSave"), data)).traceWith(Action(Admin, UI, "save form"), data)
         queryApi    = Search()
         queryString = "the quick brown fox"
-        userQuery <- queryString.asTask
+        userQuery <- (queryString.asTask *> queryApi.query(queryString).traceWith(Action(UI, Service, "query"), queryString))
           .traceWith(Action(Admin, UI, "do a search"), queryString)
-          .fork
-        _       <- queryApi.query(queryString)
-        _       <- userQuery.join
         mermaid <- t.mermaid
         c4      <- t.c4
       yield (mermaid.diagram(), c4.diagram())
