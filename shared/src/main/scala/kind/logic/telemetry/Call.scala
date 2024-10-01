@@ -12,7 +12,7 @@ import zio._
   *   a holder for when the response completes
   */
 private[telemetry] final class Call(
-    id : Long,
+    id: Long,
     invocation: CallSite,
     response: Ref[CallResponse]
 ) {
@@ -38,7 +38,7 @@ private[telemetry] final class Call(
     for
       either <- result.either
       time   <- now
-      id <- telemetry.nextId()
+      id     <- telemetry.nextId()
       result <- either match {
         case Left(err) =>
           for
@@ -53,7 +53,7 @@ private[telemetry] final class Call(
 }
 
 object Call {
-  def apply(id : Long, action: Action, operation: Any): UIO[Call] = {
+  def apply(id: Long, action: Action, operation: Any): UIO[Call] = {
     for
       time        <- now
       responseRef <- Ref.make[CallResponse](CallResponse.NotCompleted)

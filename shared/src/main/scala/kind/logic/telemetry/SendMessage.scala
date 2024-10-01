@@ -9,7 +9,7 @@ import scala.concurrent.duration.*
 /** Representation of a message being sent from one actor to another
   */
 case class SendMessage(
-    callId : Long,
+    callId: Long,
     from: Container,
     to: Container,
     timestamp: kind.logic.Timestamp,
@@ -95,7 +95,7 @@ object SendMessage {
   }
 
   private def commentForResult(call: CompletedCall) = call.response match {
-    case CallResponse.NotCompleted         => "never completed"
+    case CallResponse.NotCompleted            => "never completed"
     case CallResponse.Error(_, _, error)      => s"Failed with '$error'"
     case CallResponse.Completed(_, _, result) => s"$result"
   }
@@ -103,7 +103,7 @@ object SendMessage {
     case Start(call: CompletedCall)
     case End(endTimestamp: Timestamp, call: CompletedCall)
     def callId = this match {
-      case Start(call) => call.callId
+      case Start(call)  => call.callId
       case End(_, call) => call.responseId.getOrElse(Long.MaxValue)
     }
     def timestamp: Timestamp = this match {
@@ -121,7 +121,7 @@ object SendMessage {
         }
       }
       (startMessages ++ endMessages).toIndexedSeq.sortBy {
-        case Msg.Start(call)          => call.callId
+        case Msg.Start(call)  => call.callId
         case Msg.End(_, call) => call.responseId.getOrElse(Long.MaxValue)
       }
     }
@@ -135,8 +135,9 @@ object SendMessage {
             // then we represent that as an async arrow: "->>+"
             val opt = messages.lift.apply(i + 1)
             val isSynchronous = opt.exists {
-              case Msg.End(_, endCall) => call.target == endCall.source && endCall.target == call.source
-              case _                       => false
+              case Msg.End(_, endCall) =>
+                call.target == endCall.source && endCall.target == call.source
+              case _ => false
             }
 
             if isSynchronous then "->>" else "->>+"
@@ -155,8 +156,9 @@ object SendMessage {
         // if the previous call was the start of this call, then its synchronous. Otherwise not
         val arrow = {
           val isSynchronous = messages.lift.apply(i - 1).exists {
-            case Msg.Start(srcCall) => srcCall.target == call.source && call.target == srcCall.source
-            case _                => false
+            case Msg.Start(srcCall) =>
+              srcCall.target == call.source && call.target == srcCall.source
+            case _ => false
           }
           if isSynchronous then "-->>" else "-->>-"
         }

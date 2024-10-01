@@ -32,9 +32,9 @@ case class Mermaid(calls: Seq[CompletedCall]) {
       maxComment: Int = 30
   ): String = s"\n```mermaid\n$mermaidStyle\n${sequenceDiagram(maxLenComment, maxComment)}```\n"
 
-  /**
-   * @return the calls as a list of messages (calls and responses)
-   */
+  /** @return
+    *   the calls as a list of messages (calls and responses)
+    */
   def callStack: Seq[SendMessage] = SendMessage.from(calls)
 
   /** This is just the sequence block part of the mermaid diagram. See 'asMermaidDiagram' for the

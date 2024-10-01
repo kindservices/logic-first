@@ -63,10 +63,13 @@ class App extends AnyWordSpec with Matchers {
       // here is a basic, typical flow where somebody saves some data and then does a query
       val data = "some input"
       val testCase = for
-        _      <- (data.asTask *> BFF.save(data).traceWith(Action(UI, BFF.System, "onSave"), data)).traceWith(Action(Admin, UI, "save form"), data)
+        _ <- (data.asTask *> BFF.save(data).traceWith(Action(UI, BFF.System, "onSave"), data))
+          .traceWith(Action(Admin, UI, "save form"), data)
         queryApi    = Search()
         queryString = "the quick brown fox"
-        userQuery <- (queryString.asTask *> queryApi.query(queryString).traceWith(Action(UI, Service, "query"), queryString))
+        userQuery <- (queryString.asTask *> queryApi
+          .query(queryString)
+          .traceWith(Action(UI, Service, "query"), queryString))
           .traceWith(Action(Admin, UI, "do a search"), queryString)
         mermaid <- t.mermaid
         c4      <- t.c4

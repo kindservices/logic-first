@@ -10,9 +10,10 @@ import java.util.concurrent.TimeUnit
   *
   * @param callsStackRef
   */
-trait Telemetry(val callsStackRef: Ref[CallStack], val counter : Ref[Long]) {
+trait Telemetry(val callsStackRef: Ref[CallStack], val counter: Ref[Long]) {
 
   private[telemetry] def nextId() = counter.updateAndGet(_ + 1)
+
   /** reset the callstack
     * @param f
     *   a transformation function
@@ -36,15 +37,17 @@ trait Telemetry(val callsStackRef: Ref[CallStack], val counter : Ref[Long]) {
     yield calls.sortBy(_.callId)
   }
 
-  /**
-   * onCall is used to append a new call to the stack
-   * @param action the compile-time known data (operations and source and target components)
-   * @param input the data used in this call
-   * @return the call
-   */
+  /** onCall is used to append a new call to the stack
+    * @param action
+    *   the compile-time known data (operations and source and target components)
+    * @param input
+    *   the data used in this call
+    * @return
+    *   the call
+    */
   def onCall(action: Action, input: Any): UIO[Call] = {
     for
-      id <- nextId()
+      id   <- nextId()
       call <- Call(id, action, input)
       _    <- callsStackRef.update(_.add(call))
     yield call
@@ -55,7 +58,7 @@ object Telemetry {
   def apply(): Telemetry = make().execOrThrow()
   def make() = {
     for
-      calls <- Ref.make(CallStack())
+      calls   <- Ref.make(CallStack())
       counter <- Ref.make(0L)
     yield new Telemetry(calls, counter) {}
   }
