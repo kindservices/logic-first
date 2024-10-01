@@ -67,7 +67,16 @@ object Container:
   def service(using obj: sourcecode.Enclosing) = of(ContainerType.Service)
   def serviceForClass[A: ClassTag]: Container  = forClass(summon[ClassTag[A]].runtimeClass).service
 
-  def of(typ: ContainerType)(using obj: sourcecode.Enclosing) = {
+  /** of is a factory method, allowing call-sites to use a DSL syntax
+    * @param typ
+    *   the container type
+    * @param enclosingScope
+    *   the enclosing scope
+    * @return
+    *   the Container for the given type, using the enclosing scope as the system and container
+    *   names
+    */
+  def of(typ: ContainerType)(using enclosingScope: sourcecode.Enclosing) = {
     // to get a C4 diagram, we'll need to extract (1) the 'Software System' and (2) the container (app, data store, etc)
     val (system, name) = systemAndContainer
 
@@ -102,24 +111,41 @@ object Container:
     new Builder(packageName, name)
   }
 
-  def systemAndContainer(using obj: sourcecode.Enclosing) = {
+  /** convenience method to return the system and container from the code scope
+    *
+    * @param enclosingScope
+    *   the enclosing scope
+    * @return
+    *   the parsed 'system' (context) and container from the enclosing code scope
+    */
+  def systemAndContainer(using enclosingScope: sourcecode.Enclosing): (String, String) = {
 
     // to get a C4 diagram, we'll need to extract (1) the 'Software System' and (2) the container (app, data store, etc)
-    obj.value.split("#").toSeq match {
+    enclosingScope.value.split("#").toSeq match {
       case Seq(_, after) =>
         val parts = after.split("\\.").toSeq
-        if parts.length > 1 then {
-          val name   = parts.init.last
-          val system = parts.init.init.last
-          (system, name)
+        if parts.length == 2 then {
+          (parts.head, parts.last)
+        } else if parts.length > 2 then {
+          try {
+            val name   = parts.init.last
+            val system = parts.init.init.last
+            (system, name)
+          } catch {
+            case scala.util.control.NonFatal(err) =>
+              sys.error(
+                s"we couldn't determine the system and container from '${enclosingScope.value}' parsing into ${parts.length} parts: ${parts
+                    .mkString(",")} : $err"
+              )
+          }
         } else {
           sys.error(
-            s"Couldn't determine the software system/component from '${obj.value} from then '$after' part split on ${after.length} parts. Please just use an explicit Container.XXX method rather than the .svc call"
+            s"we couldn't determine the software system/component from '${enclosingScope.value} from then '$after' part split on ${after.length} parts. Please just use an explicit Container.XXX method rather than the .svc call"
           )
         }
       case other =>
         sys.error(
-          s"Couldn't determine the software system/component from '${obj.value} by splitting on the # character. Please just use an explicit Container.XXX method rather than the .svc call"
+          s"we couldn't determine the software system/component from '${enclosingScope.value} by splitting on the # character. Please just use an explicit Container.XXX method rather than the .svc call"
         )
     }
   }

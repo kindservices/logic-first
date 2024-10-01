@@ -11,6 +11,7 @@ object Mermaid {
 }
 
 case class Mermaid(calls: Seq[CompletedCall]) {
+
   import Mermaid.*
 
   def asMermaid(
@@ -31,9 +32,10 @@ case class Mermaid(calls: Seq[CompletedCall]) {
       maxComment: Int = 30
   ): String = s"\n```mermaid\n$mermaidStyle\n${sequenceDiagram(maxLenComment, maxComment)}```\n"
 
-  def asCallStack(all: Seq[CompletedCall]): Seq[SendMessage] = SendMessage.from(all)
-
-  def callStack = asCallStack(calls)
+  /** @return
+    *   the calls as a list of messages (calls and responses)
+    */
+  def callStack: Seq[SendMessage] = SendMessage.from(calls)
 
   /** This is just the sequence block part of the mermaid diagram. See 'asMermaidDiagram' for the
     * full markdown version
@@ -42,14 +44,14 @@ case class Mermaid(calls: Seq[CompletedCall]) {
     *   the calls as a mermaid sequence diagram
     */
   def sequenceDiagram(maxLenComment: Int, maxComment: Int): String = {
-    val stack                   = asCallStack(calls)
+    val stack                   = callStack
     val statements: Seq[String] = stack.map(_.asMermaidString(maxLenComment, maxComment))
 
     // Here we group the participants by category to produce (1) a sorted list of the categories and (2) the actors by category
     (participants(calls) ++ statements).mkString("sequenceDiagram\n\t", "\n\t", "\n")
   }
 
-  def participants(all: Seq[CompletedCall]): Seq[String] = {
+  private def participants(all: Seq[CompletedCall]): Seq[String] = {
     val (orderedCategories, actorsByCategory) = all
       .sortBy(_.timestamp.asNanos)
       .foldLeft((Seq[String](), Map[String, Seq[Container]]())) {

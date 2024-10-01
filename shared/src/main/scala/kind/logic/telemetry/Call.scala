@@ -12,6 +12,7 @@ import zio._
   *   a holder for when the response completes
   */
 private[telemetry] final class Call(
+    id: Long,
     invocation: CallSite,
     response: Ref[CallResponse]
 ) {
@@ -23,7 +24,7 @@ private[telemetry] final class Call(
 
   def asCompletedCall: UIO[CompletedCall] = {
     response.get.map { resp =>
-      CompletedCall(invocation, resp)
+      CompletedCall(id, resp.responseId, invocation, resp)
     }
   }
 
@@ -33,28 +34,29 @@ private[telemetry] final class Call(
     * @return
     *   a 'pimped' Task which will update the response ref when run
     */
-  def completeWith[A](result: Task[A]): Task[A] = {
+  def completeWith[A](result: Task[A], telemetry: Telemetry): Task[A] = {
     for
       either <- result.either
       time   <- now
+      id     <- telemetry.nextId()
       result <- either match {
         case Left(err) =>
           for
-            _      <- response.set(CallResponse.Error(time.asTimestampNanos, err))
+            _      <- response.set(CallResponse.Error(id, time.asTimestampNanos, err))
             failed <- ZIO.fail(err)
           yield failed
         case Right(ok) =>
-          response.set(CallResponse.Completed(time.asTimestampNanos, ok)).as(ok)
+          response.set(CallResponse.Completed(id, time.asTimestampNanos, ok)).as(ok)
       }
     yield result
   }
 }
 
 object Call {
-  def apply(action: Action, operation: Any): ZIO[Any, Nothing, Call] = {
+  def apply(id: Long, action: Action, operation: Any): UIO[Call] = {
     for
       time        <- now
       responseRef <- Ref.make[CallResponse](CallResponse.NotCompleted)
-    yield new Call(CallSite(action, operation, time.asTimestampNanos), responseRef)
+    yield new Call(id, CallSite(action, operation, time.asTimestampNanos), responseRef)
   }
 }

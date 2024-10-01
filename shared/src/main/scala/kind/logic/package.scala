@@ -27,7 +27,7 @@ package object logic {
   ): Task[A] = {
     for
       call   <- telemetry.onCall(action, input)
-      result <- call.completeWith(job)
+      result <- call.completeWith(job, telemetry)
     yield result
   }
 
@@ -75,9 +75,7 @@ package object logic {
       */
     def traceWith(action: Action, input: Any = null)(using
         telemetry: Telemetry
-    ): Task[A] = {
-      traceTask(job, action, Option(input).getOrElse(()))
-    }
+    ): Task[A] = traceTask(job, action, Option(input).getOrElse(()))
 
     /** @return
       *   this task a 'Result' (something convenient for RunnablePrograms to run)

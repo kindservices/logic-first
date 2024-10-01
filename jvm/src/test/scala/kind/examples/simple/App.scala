@@ -8,89 +8,71 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import zio.*
 
+/** This is a basic example, written as a test-case.
+  *
+  * It contains the components (Containers) for an n-tier app consisting of some users, a UI, a
+  * backend-for-frontend, service and database.
+  */
 class App extends AnyWordSpec with Matchers {
 
-  object nested {
+  given UI: Container       = Container.webApp("App", "UI")
+  given Service: Container  = Container.service("App", "Backend")
+  given Database: Container = Container.database("App", "PostgreSQL")
 
-    object web3 {
-      trait Blockchain {
-        import Blockchain.*
-        def publish(smartContract: SmartContract): Task[ContractId]
-      }
-      object Blockchain {
-        type SmartContract = String
-        type ContractId    = String
-        given System: Container = Container.service
-        val Chain: Container    = Container.database.withName("besu")
+  given Admin: Container = Container.person("Acme", "Admin")
 
-        def apply()(using t: Telemetry): Blockchain = new Blockchain {
-          def publish(smartContract: SmartContract): Task[ContractId] = {
-            val id: ContractId = smartContract.hashCode().toString
-            id.asTask.traceWith(Action.calls(Chain), smartContract)
+  // this is an example of just a naked function - some operation we annotate w/ our service
+  def saveData(data: String)(using telemetry: Telemetry) = {
+    given System: Container = Service
+    data.hashCode().asTask.traceWith(Action.calls(Database), data)
+  }
+
+  // this is an example of a basic object (not a trait) where we can just put some functions
+  object BFF {
+    given System: Container = Container.service
+    def save(data: String)(using telemetry: Telemetry) =
+      saveData(data).traceWith(Action.calls(Service), data)
+  }
+
+  // this is a more typical example of defining an interface for a service with a companion object
+  trait Search {
+    def query(term: String): Task[Seq[Search.Result]]
+  }
+  object Search {
+    // just some made-up type. Here we have a map of words to their length
+    type Result = Map[String, Int]
+
+    // this could be a micro-service, but here we'll make search the responsibility of the same B/E service
+    given System: Container = Service
+
+    def apply()(using telemetry: Telemetry): Search = new Search {
+      override def query(term: String): Task[Seq[Search.Result]] = {
+        val parts = term.split(" ").toSeq
+        for result <- ZIO.foreachPar(parts) { word =>
+            Map(word -> word.length).asTask.traceWith(Action.calls(Database), word)
           }
-        }
-      }
-    }
-    // this object name will be used as the 'software system'
-    object contracts {
-      type Spreadsheet   = Json
-      type ApplicationId = String
-      type ContractId    = String
-
-      val testSpreadsheet = """{ "a" : "b" }""".parseAsJson
-
-      case class Asset(name: String, data: Json)
-
-      trait Onboarding {
-        def create(spreadsheet: Spreadsheet): Task[ApplicationId]
-
-        def list(): Task[Map[ApplicationId, Spreadsheet]]
-
-        def publish(id: ApplicationId): Task[ContractId]
-      }
-
-      object Onboarding {
-        // this name will be used as the 'component name'. The enclosing object 'assets' will be the 'software system'
-        given System: Container = Container.service
-        val Database            = Container.database.withName("DB")
-
-        def apply(chain: web3.Blockchain)(using t: Telemetry): Onboarding = new Onboarding {
-          def create(spreadsheet: Spreadsheet): Task[ApplicationId] =
-            "id".asTask.traceWith(Action.calls(Database), spreadsheet)
-
-          def list(): Task[Map[ApplicationId, Spreadsheet]] =
-            Map("1" -> testSpreadsheet).asTask.traceWith(Action.calls(Database))
-
-          override def publish(id: ApplicationId): Task[ContractId] = {
-            val contract = s"smart contract for $id"
-            for
-              assetID <- chain
-                .publish(contract)
-                .traceWith(
-                  Action.calls(web3.Blockchain.System, "publishToChain"),
-                  id
-                )
-              _ <- s"db:id:${id}".asTask
-                .traceWith(Action.calls(Database, "writeToDatabase"), assetID)
-            yield id
-          }
-        }
+        yield result
       }
     }
   }
-  import nested.*
 
-  "Example Web3 App" should {
-    "create a sequence diagram" in {
-      given t: Telemetry                   = Telemetry()
-      val dlt                              = web3.Blockchain()
-      val onboarding: contracts.Onboarding = contracts.Onboarding(dlt)
+  "Example App" should {
+    "create a sequence diagram and c4 diagram from a basic app" in {
+      given t: Telemetry = Telemetry()
 
+      // here is a basic, typical flow where somebody saves some data and then does a query
+      val data = "some input"
       val testCase = for
-        applicationId <- onboarding.create(contracts.testSpreadsheet)
-        assetId       <- onboarding.publish(applicationId)
-        mermaid       <- t.mermaid
-        c4            <- t.c4
+        _ <- (data.asTask *> BFF.save(data).traceWith(Action(UI, BFF.System, "onSave"), data))
+          .traceWith(Action(Admin, UI, "save form"), data)
+        queryApi    = Search()
+        queryString = "the quick brown fox"
+        userQuery <- (queryString.asTask *> queryApi
+          .query(queryString)
+          .traceWith(Action(UI, Service, "query"), queryString))
+          .traceWith(Action(Admin, UI, "do a search"), queryString)
+        mermaid <- t.mermaid
+        c4      <- t.c4
       yield (mermaid.diagram(), c4.diagram())
 
       val (mermaidDiagram, c4) = testCase.execOrThrow()
