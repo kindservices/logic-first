@@ -136,7 +136,7 @@ object SendMessage {
             val opt = messages.lift.apply(i + 1)
             val isSynchronous = opt.exists {
               case Msg.End(_, endCall) => call.callId == endCall.callId
-              case _ => false
+              case _                   => false
             }
 
             if isSynchronous then "->>" else "->>+"
@@ -156,7 +156,7 @@ object SendMessage {
         val arrow = {
           val isSynchronous = messages.lift.apply(i - 1).exists {
             case Msg.Start(srcCall) => call.callId == srcCall.callId
-            case _ => false
+            case _                  => false
           }
           if isSynchronous then "-->>" else "-->>-"
         }
