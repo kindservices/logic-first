@@ -119,33 +119,13 @@ object Container:
     *   the parsed 'system' (context) and container from the enclosing code scope
     */
   def systemAndContainer(using enclosingScope: sourcecode.Enclosing): (String, String) = {
+    def splitOn(text : String, chars : Seq[String]) : Seq[String] = chars match {
+        case Seq() => Seq(text)
+        case head +: tail => text.split(head).toSeq.flatMap(w => splitOn(w, tail))
+      }
 
-    // to get a C4 diagram, we'll need to extract (1) the 'Software System' and (2) the container (app, data store, etc)
-    enclosingScope.value.split("#").toSeq match {
-      case Seq(_, after) =>
-        val parts = after.split("\\.").toSeq
-        if parts.length == 2 then {
-          (parts.head, parts.last)
-        } else if parts.length > 2 then {
-          try {
-            val name   = parts.init.last
-            val system = parts.init.init.last
-            (system, name)
-          } catch {
-            case scala.util.control.NonFatal(err) =>
-              sys.error(
-                s"we couldn't determine the system and container from '${enclosingScope.value}' parsing into ${parts.length} parts: ${parts
-                    .mkString(",")} : $err"
-              )
-          }
-        } else {
-          sys.error(
-            s"we couldn't determine the software system/component from '${enclosingScope.value} from then '$after' part split on ${after.length} parts. Please just use an explicit Container.XXX method rather than the .svc call"
-          )
-        }
-      case other =>
-        sys.error(
-          s"we couldn't determine the software system/component from '${enclosingScope.value} by splitting on the # character. Please just use an explicit Container.XXX method rather than the .svc call"
-        )
+    splitOn(enclosingScope.value, Seq("#", "\\.", " ")) match {
+      case Seq(only) => ("", only)
+      case many => (many.init.last, many.last)
     }
   }
