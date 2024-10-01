@@ -135,8 +135,7 @@ object SendMessage {
             // then we represent that as an async arrow: "->>+"
             val opt = messages.lift.apply(i + 1)
             val isSynchronous = opt.exists {
-              case Msg.End(_, endCall) =>
-                call.target == endCall.source && endCall.target == call.source
+              case Msg.End(_, endCall) => call.callId == endCall.callId
               case _ => false
             }
 
@@ -156,8 +155,7 @@ object SendMessage {
         // if the previous call was the start of this call, then its synchronous. Otherwise not
         val arrow = {
           val isSynchronous = messages.lift.apply(i - 1).exists {
-            case Msg.Start(srcCall) =>
-              srcCall.target == call.source && call.target == srcCall.source
+            case Msg.Start(srcCall) => call.callId == srcCall.callId
             case _ => false
           }
           if isSynchronous then "-->>" else "-->>-"
