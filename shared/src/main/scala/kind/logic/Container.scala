@@ -13,7 +13,7 @@ import upickle.default.*
   * @param label
   *   what should we call this thing?
   */
-case class Container(`type`: ContainerType, softwareSystem: String, label: String)
+case class Container(`type`: ContainerType, softwareSystem: String, label: String, tags: Set[String] = Set.empty)
     derives ReadWriter {
   def withName(newName: String)        = copy(label = newName)
   def withType(newType: ContainerType) = copy(`type` = newType)
