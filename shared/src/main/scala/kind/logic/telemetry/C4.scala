@@ -1,11 +1,21 @@
 package kind.logic.telemetry
 
+import kind.logic.color.Colors
 import kind.logic.{Container, ContainerType}
 import kind.logic.json.*
 
 import scala.collection.immutable
 
 object C4 {
+
+  case class ElementStyle(bgColor: String, color: String)
+
+  case class Style(style: String = C4.DefaultStyle,
+                   colorMap : Map[String, C4.ElementStyle] = Map.empty,
+                   layoutByName: Map[String, String] = Map.empty,
+                   defaultSystemLayout : String = "autolayout lr",
+                   defaultContainerLayout : String = "autolayout lr"
+                  )
 
   extension (text: String) {
     def asPerson    = s"${text.asIdentifier}Person"
@@ -74,16 +84,19 @@ object C4 {
     def asC4: String = {
 
       val declarations = containers.map { container =>
-        s"""             ${container.label.asContainer} = container "${container.label}" {
-           |               tags "${container.`type`}"
+        s"""
+           |             ${container.label.asContainer} = container "${container.label}" {
+           |               tags "${container.`type`}" "${container.label}"
            |             }
            |""".stripMargin
       }
 
       declarations.mkString(
-        s"""    ${name.asSystem} = softwareSystem "${name}" { \n""",
+        s"""    ${name.asSystem} = softwareSystem "${name}" {
+           |       tags "${name}"
+           |\n""".stripMargin,
         "\n",
-        s"\n          }"
+        s"\n    }"
       )
     }
   }
@@ -137,17 +150,19 @@ object C4 {
       |                shape cylinder
       |            }
       |""".stripMargin
+
 }
 
 /** https://c4model.com/abstractions/container
   *
   * @param calls
   */
-case class C4(calls: Seq[CompletedCall], layoutByName: Map[String, String] = Map.empty) {
+case class C4(calls: Seq[CompletedCall]) {
 
   import C4.*
 
-  def diagram(style: String = C4.DefaultStyle): String = {
+
+  def diagram(settings: C4.Style = C4.Style()): String = {
     s"""
        |workspace {
        |    model {
@@ -168,12 +183,14 @@ case class C4(calls: Seq[CompletedCall], layoutByName: Map[String, String] = Map
        |    }
        |
        |    views {
-       |        ${views}
+       |        ${views(settings)}
        |
        |        theme default
        |
        |         styles {
-       |         ${style}
+       |         ${settings.style}
+       |
+       |${colors(settings.colorMap)}
        |        }
        |    }
        |
@@ -205,14 +222,16 @@ case class C4(calls: Seq[CompletedCall], layoutByName: Map[String, String] = Map
   private def systems: Seq[SoftwareSystem] = {
     val callsByTargetSystem: Map[String, Seq[CompletedCall]] =
       calls.groupBy(_.action.target.softwareSystem)
-    calls
-      .groupBy(_.action.source.softwareSystem)
-      .map { case (name, callsBySourceSystem) =>
-        val callsIntoTarget = callsByTargetSystem.getOrElse(name, Nil)
 
-        SoftwareSystem(name, callsIntoTarget, callsBySourceSystem)
-      }
-      .toSeq
+    val callsBySourceSystem = calls.groupBy(_.action.source.softwareSystem)
+
+    val allCalls =   callsByTargetSystem.keySet ++ callsBySourceSystem.keySet
+
+    allCalls.map { name =>
+        val callsIntoTarget = callsByTargetSystem.getOrElse(name, Nil)
+        val bySource = callsBySourceSystem.getOrElse(name, Nil)
+        SoftwareSystem(name, callsIntoTarget, bySource)
+      }.toSeq
   }
 
   /** {{{
@@ -251,20 +270,36 @@ case class C4(calls: Seq[CompletedCall], layoutByName: Map[String, String] = Map
     operations.mkString("\n", "\n", "")
   }
 
-  private def views: String = {
+  private def views(style: C4.Style): String = {
+    import style.*
     val view = systems.map { s =>
       s"""        systemContext ${s.name.asSystem} "${s.name}" {
           |            include *
-          |            ${layoutByName.getOrElse(s.name, "autolayout lr")}
+          |            ${layoutByName.getOrElse(s.name, defaultSystemLayout)}
           |        }
           |
           |        container ${s.name.asSystem} {
           |            include *
-          |            ${layoutByName.getOrElse(s.name, "autolayout lr")}
+          |            ${layoutByName.getOrElse(s.name, defaultContainerLayout)}
           |        }
           |""".stripMargin
     }
 
     view.mkString("\n", "\n", "")
+  }
+
+  private def colors(colorMap : Map[String, C4.ElementStyle]) = {
+    systems.zip(Colors(systems.size)).map {
+      case (s, color) =>
+        val bg = colorMap.get(s.name).map(_.bgColor).getOrElse(color)
+        val fg = colorMap.get(s.name).map(_.color).getOrElse("#000000")
+
+        s"""
+           |            element "${s.name}" {
+           |                 background "$bg"
+           |                 color "$fg"
+           |            }
+           |""".stripMargin
+    }.mkString("\n")
   }
 }

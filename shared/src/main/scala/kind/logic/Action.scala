@@ -55,9 +55,10 @@ object Action {
     if parts.length < 2 then {
       val pathParts = src.value.split("\\.").toSeq
       if pathParts.length < 2 then {
-        sys.error(s"We couldn't derive the operation from ${src.value} split on '#' or '.'. As a fix, just don't use 'Action.calls' for ${src.value}")
+        sys.error(
+          s"We couldn't derive the operation from ${src.value} split on '#' or '.'. As a fix, just don't use 'Action.calls' for ${src.value}"
+        )
       } else pathParts.last.replaceAll("\\$1", "").trim
-    } else
-      parts.last.replaceAll("\\$1", "").trim
+    } else parts.last.replaceAll("\\$1", "").trim
   }
 }

@@ -13,8 +13,12 @@ import upickle.default.*
   * @param label
   *   what should we call this thing?
   */
-case class Container(`type`: ContainerType, softwareSystem: String, label: String, tags: Set[String] = Set.empty)
-    derives ReadWriter {
+case class Container(
+    `type`: ContainerType,
+    softwareSystem: String,
+    label: String,
+    tags: Set[String] = Set.empty
+) derives ReadWriter {
   def withName(newName: String)        = copy(label = newName)
   def withType(newType: ContainerType) = copy(`type` = newType)
   def qualified                        = s"$softwareSystem.$label"
@@ -119,13 +123,13 @@ object Container:
     *   the parsed 'system' (context) and container from the enclosing code scope
     */
   def systemAndContainer(using enclosingScope: sourcecode.Enclosing): (String, String) = {
-    def splitOn(text : String, chars : Seq[String]) : Seq[String] = chars match {
-        case Seq() => Seq(text)
-        case head +: tail => text.split(head).toSeq.flatMap(w => splitOn(w, tail))
-      }
+    def splitOn(text: String, chars: Seq[String]): Seq[String] = chars match {
+      case Seq()        => Seq(text)
+      case head +: tail => text.split(head).toSeq.flatMap(w => splitOn(w, tail))
+    }
 
     splitOn(enclosingScope.value, Seq("#", "\\.", " ")) match {
       case Seq(only) => ("", only)
-      case many => (many.init.last, many.last)
+      case many      => (many.init.last, many.last)
     }
   }
