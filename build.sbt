@@ -1,4 +1,4 @@
-import org.scalajs.linker.interface.ModuleSplitStyle
+import org.scalajs.linker.interface.{ModuleSplitStyle, OutputPatterns}
 // import scalafix.sbt.ScalafixPlugin.autoImport.*
 
 val githubUser = "kindservices"
@@ -89,8 +89,8 @@ lazy val app = crossProject(JSPlatform, JVMPlatform).in(file(".")).
     ),
     scalaJSLinkerConfig ~= {
       _.withModuleKind(ModuleKind.ESModule)
-        .withModuleSplitStyle(
-          ModuleSplitStyle.SmallModulesFor(List("kind")))
+        .withModuleSplitStyle(ModuleSplitStyle.SmallestModules)
+        .withOutputPatterns(OutputPatterns.fromJSFile("%s.mjs"))
     },
   )
 

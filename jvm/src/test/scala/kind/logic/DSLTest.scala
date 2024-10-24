@@ -15,8 +15,8 @@ class DSLTest extends AnyWordSpec with Matchers {
     "be able trace scala code blocks which return a Task using 'withArgs'" in {
 
       // for the 'call' DSL, we need telemetry and a source container in-scope
-      given t : Telemetry = Telemetry()
-      given user : Container = Container.person("org", "user")
+      given t: Telemetry    = Telemetry()
+      given user: Container = Container.person("org", "user")
 
       locally {
         // the example under test
@@ -25,7 +25,7 @@ class DSLTest extends AnyWordSpec with Matchers {
         }
 
         returnsATask.execOrThrow() shouldBe "I am a task"
-        val mermaid = t.mermaid.execOrThrow()
+        val mermaid       = t.mermaid.execOrThrow()
         val Seq(onlyCall) = mermaid.calls
 
         onlyCall.input shouldBe 123
@@ -38,8 +38,8 @@ class DSLTest extends AnyWordSpec with Matchers {
     "be able trace scala code blocks which return a Task" in {
 
       // for the 'call' DSL, we need telemetry and a source container in-scope
-      given t : Telemetry = Telemetry()
-      given user : Container = Container.person("org", "user")
+      given t: Telemetry    = Telemetry()
+      given user: Container = Container.person("org", "user")
 
       locally {
         // the example under test
@@ -48,7 +48,7 @@ class DSLTest extends AnyWordSpec with Matchers {
         }
 
         returnsATask.execOrThrow() shouldBe "I am a task"
-        val mermaid = t.mermaid.execOrThrow()
+        val mermaid       = t.mermaid.execOrThrow()
         val Seq(onlyCall) = mermaid.calls
 
         onlyCall.input shouldBe ()
@@ -61,8 +61,8 @@ class DSLTest extends AnyWordSpec with Matchers {
     "be able trace normal scala code blocks" in {
 
       // for the 'call' DSL, we need telemetry and a source container in-scope
-      given t : Telemetry = Telemetry()
-      given user : Container = Container.person("org", "user")
+      given t: Telemetry    = Telemetry()
+      given user: Container = Container.person("org", "user")
 
       locally {
         // the example under test
@@ -72,7 +72,7 @@ class DSLTest extends AnyWordSpec with Matchers {
         }
 
         someExampleWithArgs.execOrThrow() shouldBe 12
-        val mermaid = t.mermaid.execOrThrow()
+        val mermaid       = t.mermaid.execOrThrow()
         val Seq(onlyCall) = mermaid.calls
 
         onlyCall.input shouldBe 1
@@ -83,7 +83,6 @@ class DSLTest extends AnyWordSpec with Matchers {
 
       }
 
-
       locally {
         // and now without the '.withArgs'
         val someExampleWithoutArgs = call(Container.service("app", "foo")) {
@@ -91,14 +90,14 @@ class DSLTest extends AnyWordSpec with Matchers {
           456
         }
         someExampleWithoutArgs.execOrThrow() shouldBe 456
-        val mermaid = t.mermaid.execOrThrow()
+        val mermaid            = t.mermaid.execOrThrow()
         val Seq(_, secondCall) = mermaid.calls
 
         secondCall.source shouldBe user
         secondCall.target shouldBe Container.service("app", "foo")
         secondCall.operation shouldBe "someExampleWithoutArgs"
         secondCall.response.asOption shouldBe Some(456)
-        secondCall.input shouldBe(())
+        secondCall.input shouldBe (())
       }
     }
   }

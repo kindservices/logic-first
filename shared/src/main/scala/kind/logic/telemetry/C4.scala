@@ -10,12 +10,13 @@ object C4 {
 
   case class ElementStyle(bgColor: String, color: String)
 
-  case class Style(style: String = C4.DefaultStyle,
-                   colorMap : Map[String, C4.ElementStyle] = Map.empty,
-                   layoutByName: Map[String, String] = Map.empty,
-                   defaultSystemLayout : String = "autolayout lr",
-                   defaultContainerLayout : String = "autolayout lr"
-                  )
+  case class Style(
+      style: String = C4.DefaultStyle,
+      colorMap: Map[String, C4.ElementStyle] = Map.empty,
+      layoutByName: Map[String, String] = Map.empty,
+      defaultSystemLayout: String = "autolayout lr",
+      defaultContainerLayout: String = "autolayout lr"
+  )
 
   extension (text: String) {
     def asPerson    = s"${text.asIdentifier}Person"
@@ -161,7 +162,6 @@ case class C4(calls: Seq[CompletedCall]) {
 
   import C4.*
 
-
   def diagram(settings: C4.Style = C4.Style()): String = {
     s"""
        |workspace {
@@ -225,13 +225,13 @@ case class C4(calls: Seq[CompletedCall]) {
 
     val callsBySourceSystem = calls.groupBy(_.action.source.softwareSystem)
 
-    val allCalls =   callsByTargetSystem.keySet ++ callsBySourceSystem.keySet
+    val allCalls = callsByTargetSystem.keySet ++ callsBySourceSystem.keySet
 
     allCalls.map { name =>
-        val callsIntoTarget = callsByTargetSystem.getOrElse(name, Nil)
-        val bySource = callsBySourceSystem.getOrElse(name, Nil)
-        SoftwareSystem(name, callsIntoTarget, bySource)
-      }.toSeq
+      val callsIntoTarget = callsByTargetSystem.getOrElse(name, Nil)
+      val bySource        = callsBySourceSystem.getOrElse(name, Nil)
+      SoftwareSystem(name, callsIntoTarget, bySource)
+    }.toSeq
   }
 
   /** {{{
@@ -288,9 +288,10 @@ case class C4(calls: Seq[CompletedCall]) {
     view.mkString("\n", "\n", "")
   }
 
-  private def colors(colorMap : Map[String, C4.ElementStyle]) = {
-    systems.zip(Colors(systems.size)).map {
-      case (s, color) =>
+  private def colors(colorMap: Map[String, C4.ElementStyle]) = {
+    systems
+      .zip(Colors(systems.size))
+      .map { case (s, color) =>
         val bg = colorMap.get(s.name).map(_.bgColor).getOrElse(color)
         val fg = colorMap.get(s.name).map(_.color).getOrElse("#000000")
 
@@ -300,6 +301,7 @@ case class C4(calls: Seq[CompletedCall]) {
            |                 color "$fg"
            |            }
            |""".stripMargin
-    }.mkString("\n")
+      }
+      .mkString("\n")
   }
 }
